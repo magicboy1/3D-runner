@@ -6,6 +6,7 @@ import { GameUI } from "./GameUI";
 import { MenuScreen } from "./MenuScreen";
 import { GameOverScreen } from "./GameOverScreen";
 import { SoundManager } from "./SoundManager";
+import { TouchControls } from "./TouchControls";
 
 enum Controls {
   left = "left",
@@ -54,6 +55,7 @@ export function Game() {
   return (
     <KeyboardControls map={keyMap}>
       <SoundManager />
+      <TouchControls />
       
       {phase === "menu" && <MenuScreen />}
       {phase === "gameover" && <GameOverScreen />}

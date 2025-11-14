@@ -17,9 +17,9 @@ export function MenuScreen() {
           اركض، اقفز، وانزلق! اجمع العملات وتجنب الفيروسات في لعبة سريعة ومثيرة!
         </p>
         <div className="bg-white/20 backdrop-blur rounded-xl p-4 mb-8 max-w-md mx-auto">
-          <p className="text-white font-bold mb-2" dir="rtl">⌨️ التحكم:</p>
-          <p className="text-white text-sm" dir="rtl">⬅️ ➡️ للتحرك بين المسارات</p>
-          <p className="text-white text-sm" dir="rtl">⬆️ للقفز | ⬇️ للانزلاق</p>
+          <p className="text-white font-bold mb-2" dir="rtl">👆 التحكم:</p>
+          <p className="text-white text-sm" dir="rtl">اسحب يمين/يسار للتحرك بين المسارات</p>
+          <p className="text-white text-sm" dir="rtl">اسحب لأعلى للقفز | اسحب لأسفل للانزلاق</p>
         </div>
         <Button 
           onClick={start}
