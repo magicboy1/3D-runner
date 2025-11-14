@@ -8,8 +8,8 @@ function PlayerModel() {
   const group = useRef<THREE.Group>(null);
   const modelRef = useRef<THREE.Object3D>(null);
   const { scene, animations } = useGLTF("/models/player.glb");
-  const { actions, mixer } = useAnimations(animations, group);
-  const legAnimationPhase = useRef(0);
+  const { actions } = useAnimations(animations, group);
+  const runningPhase = useRef(0);
   
   useEffect(() => {
     if (actions && Object.keys(actions).length > 0) {
@@ -19,15 +19,23 @@ function PlayerModel() {
         console.log("Playing animation:", Object.keys(actions)[0]);
       }
     } else {
-      console.log("No animations found in model, will use manual animation");
+      console.log("No animations found in model, will use manual running animation");
     }
   }, [actions]);
   
   useFrame((state, delta) => {
     if (!actions || Object.keys(actions).length === 0) {
-      legAnimationPhase.current += delta * 8;
+      runningPhase.current += delta * 12;
+      
       if (group.current) {
-        group.current.rotation.z = Math.sin(legAnimationPhase.current) * 0.1;
+        const bounce = Math.abs(Math.sin(runningPhase.current)) * 0.08;
+        group.current.position.y = bounce;
+        
+        const tilt = Math.sin(runningPhase.current) * 0.08;
+        group.current.rotation.x = tilt - 0.1;
+        
+        const sway = Math.sin(runningPhase.current * 0.5) * 0.05;
+        group.current.rotation.y = sway;
       }
     }
   });
