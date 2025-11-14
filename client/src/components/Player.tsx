@@ -4,13 +4,18 @@ import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import { useStepChallenge } from "@/lib/stores/useStepChallenge";
 
-function PlayerModel() {
+function PlayerModel({ isRunning, animationPhase }: { isRunning: boolean, animationPhase: number }) {
   const { scene } = useGLTF("/models/player.glb");
   const clonedScene = scene.clone();
   
-  clonedScene.rotation.y = Math.PI;
+  clonedScene.rotation.y = 0;
   
-  return <primitive object={clonedScene} scale={1.5} position={[0, 0.6, 0]} />;
+  if (isRunning) {
+    clonedScene.rotation.x = Math.sin(animationPhase * 10) * 0.05;
+    clonedScene.position.y = Math.abs(Math.sin(animationPhase * 10)) * 0.1;
+  }
+  
+  return <primitive object={clonedScene} scale={1.5} position={[0, 0, 0]} />;
 }
 
 export function Player() {
@@ -23,6 +28,7 @@ export function Player() {
   const jumpVelocityRef = useRef(0);
   const isJumpingRef = useRef(false);
   const slideTimerRef = useRef(0);
+  const animationPhaseRef = useRef(0);
   
   const lanePositions = {
     left: -4,
@@ -41,6 +47,8 @@ export function Player() {
   
   useFrame((state, delta) => {
     if (groupRef.current) {
+      animationPhaseRef.current += delta;
+      
       const targetX = lanePositions[currentLane];
       groupRef.current.position.x = THREE.MathUtils.lerp(
         groupRef.current.position.x,
@@ -86,7 +94,7 @@ export function Player() {
           <meshStandardMaterial color="#4CAF50" />
         </mesh>
       }>
-        <PlayerModel />
+        <PlayerModel isRunning={true} animationPhase={animationPhaseRef.current} />
       </Suspense>
     </group>
   );
