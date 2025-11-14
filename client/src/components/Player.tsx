@@ -5,70 +5,26 @@ import * as THREE from "three";
 import { useStepChallenge } from "@/lib/stores/useStepChallenge";
 
 function PlayerModel() {
+  const group = useRef<THREE.Group>(null);
+  const { scene } = useGLTF("/models/player.glb");
+  const clonedScene = scene.clone();
   const runPhase = useRef(0);
-  const bodyRef = useRef<THREE.Mesh>(null);
-  const leftLegRef = useRef<THREE.Mesh>(null);
-  const rightLegRef = useRef<THREE.Mesh>(null);
-  const leftArmRef = useRef<THREE.Mesh>(null);
-  const rightArmRef = useRef<THREE.Mesh>(null);
   
   useFrame((state, delta) => {
-    runPhase.current += delta * 10;
+    runPhase.current += delta * 8;
     
-    if (leftLegRef.current && rightLegRef.current) {
-      leftLegRef.current.rotation.x = Math.sin(runPhase.current) * 0.6;
-      rightLegRef.current.rotation.x = Math.sin(runPhase.current + Math.PI) * 0.6;
-    }
-    
-    if (leftArmRef.current && rightArmRef.current) {
-      leftArmRef.current.rotation.x = Math.sin(runPhase.current + Math.PI) * 0.5;
-      rightArmRef.current.rotation.x = Math.sin(runPhase.current) * 0.5;
-    }
-    
-    if (bodyRef.current) {
-      bodyRef.current.position.y = 0.6 + Math.abs(Math.sin(runPhase.current * 2)) * 0.05;
+    if (group.current) {
+      const bounce = Math.abs(Math.sin(runPhase.current)) * 0.03;
+      group.current.position.y = bounce;
+      
+      const tilt = Math.sin(runPhase.current) * 0.02;
+      group.current.rotation.x = tilt;
     }
   });
   
   return (
-    <group position={[0, 0, 0]}>
-      <mesh ref={bodyRef} position={[0, 0.6, 0]} castShadow>
-        <boxGeometry args={[0.5, 0.7, 0.3]} />
-        <meshStandardMaterial color="#4A90E2" />
-      </mesh>
-      
-      <mesh position={[0, 0.95, 0]} castShadow>
-        <sphereGeometry args={[0.25, 16, 16]} />
-        <meshStandardMaterial color="#FFD4A3" />
-      </mesh>
-      
-      <group position={[-0.15, 0.25, 0]}>
-        <mesh ref={leftLegRef} position={[0, -0.25, 0]} castShadow>
-          <boxGeometry args={[0.15, 0.5, 0.15]} />
-          <meshStandardMaterial color="#2E5C8A" />
-        </mesh>
-      </group>
-      
-      <group position={[0.15, 0.25, 0]}>
-        <mesh ref={rightLegRef} position={[0, -0.25, 0]} castShadow>
-          <boxGeometry args={[0.15, 0.5, 0.15]} />
-          <meshStandardMaterial color="#2E5C8A" />
-        </mesh>
-      </group>
-      
-      <group position={[-0.35, 0.85, 0]}>
-        <mesh ref={leftArmRef} position={[0, -0.2, 0]} castShadow>
-          <boxGeometry args={[0.12, 0.4, 0.12]} />
-          <meshStandardMaterial color="#4A90E2" />
-        </mesh>
-      </group>
-      
-      <group position={[0.35, 0.85, 0]}>
-        <mesh ref={rightArmRef} position={[0, -0.2, 0]} castShadow>
-          <boxGeometry args={[0.12, 0.4, 0.12]} />
-          <meshStandardMaterial color="#4A90E2" />
-        </mesh>
-      </group>
+    <group ref={group} position={[0, 0.8, 0]}>
+      <primitive object={clonedScene} scale={1.5} />
     </group>
   );
 }
