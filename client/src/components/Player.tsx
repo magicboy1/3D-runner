@@ -5,44 +5,70 @@ import * as THREE from "three";
 import { useStepChallenge } from "@/lib/stores/useStepChallenge";
 
 function PlayerModel() {
-  const group = useRef<THREE.Group>(null);
-  const modelRef = useRef<THREE.Object3D>(null);
-  const { scene, animations } = useGLTF("/models/player.glb");
-  const { actions } = useAnimations(animations, group);
-  const runningPhase = useRef(0);
-  
-  useEffect(() => {
-    if (actions && Object.keys(actions).length > 0) {
-      const firstAction = Object.values(actions)[0];
-      if (firstAction) {
-        firstAction.play();
-        console.log("Playing animation:", Object.keys(actions)[0]);
-      }
-    } else {
-      console.log("No animations found in model, will use manual running animation");
-    }
-  }, [actions]);
+  const runPhase = useRef(0);
+  const bodyRef = useRef<THREE.Mesh>(null);
+  const leftLegRef = useRef<THREE.Mesh>(null);
+  const rightLegRef = useRef<THREE.Mesh>(null);
+  const leftArmRef = useRef<THREE.Mesh>(null);
+  const rightArmRef = useRef<THREE.Mesh>(null);
   
   useFrame((state, delta) => {
-    if (!actions || Object.keys(actions).length === 0) {
-      runningPhase.current += delta * 12;
-      
-      if (group.current) {
-        const bounce = Math.abs(Math.sin(runningPhase.current)) * 0.08;
-        group.current.position.y = 0.8 + bounce;
-        
-        const tilt = Math.sin(runningPhase.current) * 0.08;
-        group.current.rotation.x = tilt - 0.1;
-        
-        const sway = Math.sin(runningPhase.current * 0.5) * 0.05;
-        group.current.rotation.y = sway;
-      }
+    runPhase.current += delta * 10;
+    
+    if (leftLegRef.current && rightLegRef.current) {
+      leftLegRef.current.rotation.x = Math.sin(runPhase.current) * 0.6;
+      rightLegRef.current.rotation.x = Math.sin(runPhase.current + Math.PI) * 0.6;
+    }
+    
+    if (leftArmRef.current && rightArmRef.current) {
+      leftArmRef.current.rotation.x = Math.sin(runPhase.current + Math.PI) * 0.5;
+      rightArmRef.current.rotation.x = Math.sin(runPhase.current) * 0.5;
+    }
+    
+    if (bodyRef.current) {
+      bodyRef.current.position.y = 0.6 + Math.abs(Math.sin(runPhase.current * 2)) * 0.05;
     }
   });
   
   return (
-    <group ref={group} position={[0, 0, 0]}>
-      <primitive ref={modelRef} object={scene} scale={1.5} />
+    <group position={[0, 0, 0]}>
+      <mesh ref={bodyRef} position={[0, 0.6, 0]} castShadow>
+        <boxGeometry args={[0.5, 0.7, 0.3]} />
+        <meshStandardMaterial color="#4A90E2" />
+      </mesh>
+      
+      <mesh position={[0, 0.95, 0]} castShadow>
+        <sphereGeometry args={[0.25, 16, 16]} />
+        <meshStandardMaterial color="#FFD4A3" />
+      </mesh>
+      
+      <group position={[-0.15, 0.25, 0]}>
+        <mesh ref={leftLegRef} position={[0, -0.25, 0]} castShadow>
+          <boxGeometry args={[0.15, 0.5, 0.15]} />
+          <meshStandardMaterial color="#2E5C8A" />
+        </mesh>
+      </group>
+      
+      <group position={[0.15, 0.25, 0]}>
+        <mesh ref={rightLegRef} position={[0, -0.25, 0]} castShadow>
+          <boxGeometry args={[0.15, 0.5, 0.15]} />
+          <meshStandardMaterial color="#2E5C8A" />
+        </mesh>
+      </group>
+      
+      <group position={[-0.35, 0.85, 0]}>
+        <mesh ref={leftArmRef} position={[0, -0.2, 0]} castShadow>
+          <boxGeometry args={[0.12, 0.4, 0.12]} />
+          <meshStandardMaterial color="#4A90E2" />
+        </mesh>
+      </group>
+      
+      <group position={[0.35, 0.85, 0]}>
+        <mesh ref={rightArmRef} position={[0, -0.2, 0]} castShadow>
+          <boxGeometry args={[0.12, 0.4, 0.12]} />
+          <meshStandardMaterial color="#4A90E2" />
+        </mesh>
+      </group>
     </group>
   );
 }
