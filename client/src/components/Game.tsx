@@ -29,28 +29,6 @@ export function Game() {
     { name: Controls.slide, keys: ["ArrowDown", "KeyS"] }
   ];
   
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (phase !== "playing") return;
-      
-      if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") {
-        if (currentLane === "right") switchLane("center");
-        else if (currentLane === "center") switchLane("left");
-      } else if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") {
-        if (currentLane === "left") switchLane("center");
-        else if (currentLane === "center") switchLane("right");
-      } else if (e.key === "ArrowUp" || e.key === "w" || e.key === "W" || e.key === " ") {
-        e.preventDefault();
-        jump();
-      } else if (e.key === "ArrowDown" || e.key === "s" || e.key === "S") {
-        e.preventDefault();
-        slide();
-      }
-    };
-    
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [phase, switchLane, currentLane, jump, slide]);
   
   return (
     <KeyboardControls map={keyMap}>
