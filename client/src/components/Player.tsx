@@ -6,21 +6,35 @@ import { useStepChallenge } from "@/lib/stores/useStepChallenge";
 
 function PlayerModel() {
   const group = useRef<THREE.Group>(null);
+  const modelRef = useRef<THREE.Object3D>(null);
   const { scene, animations } = useGLTF("/models/player.glb");
-  const { actions } = useAnimations(animations, group);
+  const { actions, mixer } = useAnimations(animations, group);
+  const legAnimationPhase = useRef(0);
   
   useEffect(() => {
     if (actions && Object.keys(actions).length > 0) {
       const firstAction = Object.values(actions)[0];
       if (firstAction) {
         firstAction.play();
+        console.log("Playing animation:", Object.keys(actions)[0]);
       }
+    } else {
+      console.log("No animations found in model, will use manual animation");
     }
   }, [actions]);
   
+  useFrame((state, delta) => {
+    if (!actions || Object.keys(actions).length === 0) {
+      legAnimationPhase.current += delta * 8;
+      if (group.current) {
+        group.current.rotation.z = Math.sin(legAnimationPhase.current) * 0.1;
+      }
+    }
+  });
+  
   return (
     <group ref={group} position={[0, 0.8, 0]}>
-      <primitive object={scene} scale={1.5} />
+      <primitive ref={modelRef} object={scene} scale={1.5} />
     </group>
   );
 }
@@ -37,9 +51,9 @@ export function Player() {
   const slideTimerRef = useRef(0);
   
   const lanePositions = {
-    left: -4,
+    left: -3,
     center: 0,
-    right: 4
+    right: 3
   };
   
   useEffect(() => {
