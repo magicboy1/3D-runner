@@ -15,7 +15,7 @@ function PlayerModel() {
     
     if (group.current) {
       const bounce = Math.abs(Math.sin(runPhase.current)) * 0.03;
-      group.current.position.y = bounce;
+      group.current.position.y = 1.2 + bounce;
       
       const tilt = Math.sin(runPhase.current) * 0.02;
       group.current.rotation.x = tilt;
@@ -23,7 +23,7 @@ function PlayerModel() {
   });
   
   return (
-    <group ref={group} position={[0, 0.8, 0]}>
+    <group ref={group} position={[0, 0, 0]}>
       <primitive object={clonedScene} scale={1.5} />
     </group>
   );
