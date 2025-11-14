@@ -5,7 +5,7 @@ import * as THREE from "three";
 import { useStepChallenge } from "@/lib/stores/useStepChallenge";
 import { useAudio } from "@/lib/stores/useAudio";
 
-type CollectibleType = "coin" | "lock" | "shield" | "magnet";
+type CollectibleType = "coin" | "lock" | "family" | "privacy" | "warning";
 
 interface Collectible {
   id: number;
@@ -19,15 +19,17 @@ interface Collectible {
 const collectibleMessages: Record<CollectibleType, string> = {
   coin: "عملة! 🪙",
   lock: "استخدم كلمة مرور قوية 🔒",
-  shield: "احرص على حماية معلوماتك 🛡️",
-  magnet: "مغناطيس العملات! 🧲"
+  family: "استأذن أهلك قبل التحميل 👨‍👩‍👧",
+  privacy: "لا تشارك موقعك 👁️",
+  warning: "احترس من الروابط الغريبة ⚠️"
 };
 
 const collectiblePoints: Record<CollectibleType, number> = {
   coin: 10,
   lock: 25,
-  shield: 25,
-  magnet: 50
+  family: 25,
+  privacy: 25,
+  warning: 25
 };
 
 function CoinModel() {
@@ -48,7 +50,7 @@ export function Collectibles() {
   const collectibles = useMemo(() => {
     const collectibleList: Collectible[] = [];
     const lanes: ("left" | "center" | "right")[] = ["left", "center", "right"];
-    const types: CollectibleType[] = ["coin", "coin", "coin", "coin", "lock", "shield", "magnet"];
+    const types: CollectibleType[] = ["coin", "coin", "coin", "lock", "family", "privacy", "warning"];
     
     for (let i = 0; i < 30; i++) {
       collectibleList.push({
@@ -73,7 +75,7 @@ export function Collectibles() {
   useFrame((state, delta) => {
     if (groupRef.current) {
       const lanes: ("left" | "center" | "right")[] = ["left", "center", "right"];
-      const types: CollectibleType[] = ["coin", "coin", "coin", "coin", "lock", "shield", "magnet"];
+      const types: CollectibleType[] = ["coin", "coin", "coin", "lock", "family", "privacy", "warning"];
       
       groupRef.current.children.forEach((child, index) => {
         const collectible = collectibles[index];
@@ -115,10 +117,11 @@ export function Collectibles() {
       return <CoinModel />;
     }
     
-    const colors = {
+    const colors: Record<Exclude<CollectibleType, "coin">, string> = {
       lock: "#2196F3",
-      shield: "#9C27B0",
-      magnet: "#FF9800"
+      family: "#4CAF50",
+      privacy: "#9C27B0",
+      warning: "#FF5722"
     };
     
     return (
