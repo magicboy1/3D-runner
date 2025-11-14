@@ -2,101 +2,121 @@ import { useStepChallenge } from "@/lib/stores/useStepChallenge";
 import { useAudio } from "@/lib/stores/useAudio";
 import { Button } from "./ui/button";
 import { Volume2, VolumeX } from "lucide-react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { useRef, useMemo } from "react";
-import * as THREE from "three";
+import { Canvas } from "@react-three/fiber";
+import { Suspense, useMemo } from "react";
+import { useGLTF } from "@react-three/drei";
 
-function FloatingObjects() {
-  const groupRef = useRef<THREE.Group>(null);
-  
-  const objects = useMemo(() => {
-    const arr = [];
-    for (let i = 0; i < 30; i++) {
-      arr.push({
-        position: [
-          (Math.random() - 0.5) * 20,
-          (Math.random() - 0.5) * 20,
-          (Math.random() - 0.5) * 20
-        ] as [number, number, number],
-        scale: Math.random() * 0.5 + 0.3,
-        speed: Math.random() * 0.5 + 0.2,
-        type: Math.random() > 0.5 ? 'box' : 'sphere'
-      });
-    }
-    return arr;
-  }, []);
-  
-  useFrame((state) => {
-    if (groupRef.current) {
-      groupRef.current.rotation.y = state.clock.elapsedTime * 0.1;
-      groupRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.2) * 0.1;
-    }
-  });
-  
+function Tree({ position }: { position: [number, number, number] }) {
   return (
-    <group ref={groupRef}>
-      {objects.map((obj, i) => (
-        <mesh key={i} position={obj.position} scale={obj.scale}>
-          {obj.type === 'box' ? (
-            <boxGeometry args={[1, 1, 1]} />
-          ) : (
-            <sphereGeometry args={[0.5, 16, 16]} />
-          )}
-          <meshStandardMaterial 
-            color={i % 3 === 0 ? "#4CAF50" : i % 3 === 1 ? "#2196F3" : "#FF9800"}
-            wireframe={i % 2 === 0}
-            transparent
-            opacity={0.6}
-          />
-        </mesh>
-      ))}
+    <group position={position}>
+      <mesh position={[0, 0.5, 0]}>
+        <cylinderGeometry args={[0.2, 0.3, 1, 8]} />
+        <meshStandardMaterial color="#8B4513" />
+      </mesh>
+      <mesh position={[0, 1.5, 0]}>
+        <sphereGeometry args={[0.8, 8, 8]} />
+        <meshStandardMaterial color="#7CB342" />
+      </mesh>
+      <mesh position={[0, 2, 0]}>
+        <sphereGeometry args={[0.6, 8, 8]} />
+        <meshStandardMaterial color="#8BC34A" />
+      </mesh>
     </group>
   );
 }
 
-function AnimatedParticles() {
-  const particlesRef = useRef<THREE.Points>(null);
-  
-  const particles = useMemo(() => {
-    const positions = new Float32Array(100 * 3);
-    for (let i = 0; i < 100; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 30;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 30;
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 30;
-    }
-    return positions;
-  }, []);
-  
-  useFrame((state) => {
-    if (particlesRef.current) {
-      particlesRef.current.rotation.y = state.clock.elapsedTime * 0.05;
-      particlesRef.current.rotation.x = state.clock.elapsedTime * 0.03;
-    }
-  });
-  
+function Cloud({ position }: { position: [number, number, number] }) {
   return (
-    <points ref={particlesRef}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          count={particles.length / 3}
-          array={particles}
-          itemSize={3}
-        />
-      </bufferGeometry>
-      <pointsMaterial size={0.1} color="#ffffff" transparent opacity={0.6} />
-    </points>
+    <group position={position}>
+      <mesh position={[0, 0, 0]}>
+        <sphereGeometry args={[0.8, 8, 8]} />
+        <meshStandardMaterial color="#FFFFFF" />
+      </mesh>
+      <mesh position={[0.6, 0.1, 0]}>
+        <sphereGeometry args={[0.6, 8, 8]} />
+        <meshStandardMaterial color="#FFFFFF" />
+      </mesh>
+      <mesh position={[-0.6, 0.1, 0]}>
+        <sphereGeometry args={[0.5, 8, 8]} />
+        <meshStandardMaterial color="#FFFFFF" />
+      </mesh>
+    </group>
   );
 }
 
-function Scene3D() {
+function PlayerPreview() {
+  const { scene } = useGLTF("/models/player.glb");
+  const clonedScene = scene.clone();
+  
+  return <primitive object={clonedScene} scale={1.5} position={[0, 1.2, -3]} />;
+}
+
+function MenuScene3D() {
+  const buildings = useMemo(() => {
+    const colors = ['#7CB342', '#42A5F5', '#FFB74D'];
+    return [
+      { x: -10, z: -15, height: 8, color: colors[0] },
+      { x: 10, z: -18, height: 6, color: colors[1] },
+      { x: -8, z: -25, height: 10, color: colors[2] },
+    ];
+  }, []);
+  
   return (
     <>
-      <ambientLight intensity={0.5} />
-      <pointLight position={[10, 10, 10]} intensity={1} />
-      <pointLight position={[-10, -10, -10]} intensity={0.5} color="#4CAF50" />
-      <FloatingObjects />
-      <AnimatedParticles />
+      <ambientLight intensity={0.8} />
+      <directionalLight position={[5, 10, 5]} intensity={1.2} castShadow />
+      <hemisphereLight args={["#87CEEB", "#8BC34A", 0.6]} />
+      
+      <mesh receiveShadow position={[0, -0.1, -5]}>
+        <boxGeometry args={[10, 0.2, 25]} />
+        <meshStandardMaterial color="#D97C47" />
+      </mesh>
+      
+      <mesh position={[-1.5, 0.01, -5]}>
+        <boxGeometry args={[0.15, 0.02, 25]} />
+        <meshStandardMaterial color="#A0522D" />
+      </mesh>
+      <mesh position={[1.5, 0.01, -5]}>
+        <boxGeometry args={[0.15, 0.02, 25]} />
+        <meshStandardMaterial color="#A0522D" />
+      </mesh>
+      
+      <mesh position={[-5.5, -0.05, -5]}>
+        <boxGeometry args={[1, 0.3, 25]} />
+        <meshStandardMaterial color="#7CB342" />
+      </mesh>
+      <mesh position={[5.5, -0.05, -5]}>
+        <boxGeometry args={[1, 0.3, 25]} />
+        <meshStandardMaterial color="#7CB342" />
+      </mesh>
+      
+      <Tree position={[-7, 0, -2]} />
+      <Tree position={[7, 0, -4]} />
+      <Tree position={[-7, 0, -10]} />
+      <Tree position={[7, 0, -12]} />
+      
+      {buildings.map((building, i) => (
+        <mesh
+          key={i}
+          position={[building.x, building.height / 2, building.z]}
+          castShadow
+        >
+          <boxGeometry args={[4, building.height, 4]} />
+          <meshStandardMaterial color={building.color} />
+        </mesh>
+      ))}
+      
+      <Cloud position={[-8, 8, -15]} />
+      <Cloud position={[8, 9, -20]} />
+      
+      <Suspense fallback={
+        <mesh position={[0, 1.2, -3]}>
+          <boxGeometry args={[0.8, 1.2, 0.8]} />
+          <meshStandardMaterial color="#4CAF50" />
+        </mesh>
+      }>
+        <PlayerPreview />
+      </Suspense>
     </>
   );
 }
@@ -110,14 +130,16 @@ export function MenuScreen() {
     <div className="fixed inset-0 z-50 overflow-hidden">
       <div className="absolute inset-0">
         <Canvas
-          camera={{ position: [0, 0, 10], fov: 75 }}
-          style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)' }}
+          shadows
+          camera={{ position: [0, 3, 8], fov: 60 }}
         >
-          <Scene3D />
+          <color attach="background" args={["#87CEEB"]} />
+          <fog attach="fog" args={["#87CEEB", 10, 40]} />
+          <MenuScene3D />
         </Canvas>
       </div>
       
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-900/20 to-black/40"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/30"></div>
       
       <Button 
         onClick={toggleMute}
@@ -128,25 +150,8 @@ export function MenuScreen() {
         {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
       </Button>
       
-      <div className="relative h-full flex flex-col lg:flex-row items-center justify-center gap-8 px-4 max-w-7xl mx-auto z-10">
-        <div className="relative perspective-1000 transform-gpu">
-          <div className="absolute inset-0 bg-gradient-to-br from-yellow-400 via-orange-400 to-pink-500 rounded-full blur-3xl opacity-40 animate-pulse" 
-               style={{ animationDuration: '2s' }}></div>
-          <div className="relative transform hover:scale-110 transition-transform duration-500">
-            <img 
-              src="/images/hero-character.png" 
-              alt="Hero Character" 
-              className="relative w-72 h-72 lg:w-96 lg:h-96 object-contain drop-shadow-2xl"
-              style={{
-                filter: 'drop-shadow(0 20px 50px rgba(255, 100, 0, 0.5))',
-                animation: 'float 3s ease-in-out infinite'
-              }}
-            />
-          </div>
-          <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-48 h-8 bg-black/30 rounded-full blur-xl"></div>
-        </div>
-        
-        <div className="text-center lg:text-right space-y-6 backdrop-blur-sm bg-white/5 p-8 rounded-3xl border border-white/20">
+      <div className="relative h-full flex flex-col items-center justify-end pb-20 px-4 max-w-4xl mx-auto z-10">
+        <div className="text-center space-y-6 backdrop-blur-md bg-white/10 p-8 rounded-3xl border-2 border-white/30 shadow-2xl">
           <div className="space-y-2">
             <h1 className="text-6xl lg:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 via-pink-200 to-purple-200 drop-shadow-lg" 
                 dir="rtl"
