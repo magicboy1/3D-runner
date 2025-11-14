@@ -50,39 +50,35 @@ export function Ground() {
     <group ref={groupRef}>
       {tiles.map((tile, index) => (
         <group key={tile.id} position={[0, 0, -tile.z]}>
-          <mesh receiveShadow position={[0, 0, 0]}>
-            <boxGeometry args={[15, 0.2, 15]} />
+          <mesh receiveShadow position={[0, -0.1, 0]}>
+            <boxGeometry args={[10, 0.2, 15]} />
             <meshStandardMaterial 
-              color="#616161"
-              roughness={0.8}
+              color="#D97C47"
+              roughness={0.9}
             />
           </mesh>
           
-          <mesh position={[-4, 0.15, 0]}>
-            <boxGeometry args={[0.2, 0.3, 15]} />
+          <mesh position={[-1.5, 0.01, 0]}>
+            <boxGeometry args={[0.15, 0.02, 15]} />
             <meshStandardMaterial 
-              color="#FFD700"
-              emissive="#FFD700"
-              emissiveIntensity={0.3}
+              color="#A0522D"
             />
           </mesh>
-          <mesh position={[4, 0.15, 0]}>
-            <boxGeometry args={[0.2, 0.3, 15]} />
+          <mesh position={[1.5, 0.01, 0]}>
+            <boxGeometry args={[0.15, 0.02, 15]} />
             <meshStandardMaterial 
-              color="#FFD700"
-              emissive="#FFD700"
-              emissiveIntensity={0.3}
+              color="#A0522D"
             />
           </mesh>
           
-          {index % 3 === 0 && (
-            <>
-              <mesh position={[0, 0.15, 0]}>
-                <boxGeometry args={[12, 0.05, 0.5]} />
-                <meshStandardMaterial color="#FFF" opacity={0.5} transparent />
-              </mesh>
-            </>
-          )}
+          <mesh position={[-5.5, -0.05, 0]}>
+            <boxGeometry args={[1, 0.3, 15]} />
+            <meshStandardMaterial color="#7CB342" />
+          </mesh>
+          <mesh position={[5.5, -0.05, 0]}>
+            <boxGeometry args={[1, 0.3, 15]} />
+            <meshStandardMaterial color="#7CB342" />
+          </mesh>
         </group>
       ))}
     </group>
