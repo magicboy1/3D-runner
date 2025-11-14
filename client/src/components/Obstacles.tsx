@@ -1,5 +1,6 @@
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, Suspense } from "react";
 import { useFrame } from "@react-three/fiber";
+import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import { useStepChallenge } from "@/lib/stores/useStepChallenge";
 import { useAudio } from "@/lib/stores/useAudio";
@@ -14,19 +15,21 @@ interface Obstacle {
   hit: boolean;
 }
 
+function VirusModel({ scale = 1 }: { scale?: number }) {
+  const { scene } = useGLTF("/models/virus.glb");
+  const clonedScene = scene.clone();
+  
+  return <primitive object={clonedScene} scale={scale} />;
+}
+
 export function Obstacles() {
   const groupRef = useRef<THREE.Group>(null);
   const currentLane = useStepChallenge((state) => state.currentLane);
-  const playerAction = useStepChallenge((state) => state.playerAction);
+  const playerY = useStepChallenge((state) => state.playerY);
+  const playerHeight = useStepChallenge((state) => state.playerHeight);
   const gameOver = useStepChallenge((state) => state.gameOver);
   const gameSpeed = useStepChallenge((state) => state.gameSpeed);
   const playHit = useAudio((state) => state.playHit);
-  
-  const warningMessages = useMemo(() => [
-    "حاول تتفادى الخطر في المرة الجاية!",
-    "انتبه! تجنب الفيروسات!",
-    "كن حذراً من الأخطار!",
-  ], []);
   
   const obstacles = useMemo(() => {
     const obstacleList: Obstacle[] = [];
@@ -59,6 +62,7 @@ export function Obstacles() {
         if (!obstacle) return;
         
         child.position.z += gameSpeed * delta;
+        child.rotation.y += delta * 2;
         
         if (child.position.z > 15) {
           child.position.z = -500;
@@ -66,21 +70,15 @@ export function Obstacles() {
           
           const lanes: ("left" | "center" | "right")[] = ["left", "center", "right"];
           const types: ObstacleType[] = ["barrier", "low", "high"];
-          obstacle.lane = lanes[Math.floor(Math.random() * lanes.length)];
-          obstacle.type = types[Math.floor(Math.random() * types.length)];
-          child.position.x = lanePositions[obstacle.lane];
+          const newLane = lanes[Math.floor(Math.random() * lanes.length)];
+          const newType = types[Math.floor(Math.random() * types.length)];
           
-          const mesh = child as THREE.Mesh;
-          if (obstacle.type === "low") {
-            mesh.scale.set(1.5, 0.6, 1);
-            mesh.position.y = 0.3;
-          } else if (obstacle.type === "high") {
-            mesh.scale.set(1, 1.5, 1);
-            mesh.position.y = 1.2;
-          } else {
-            mesh.scale.set(1, 1.8, 1);
-            mesh.position.y = 0.9;
-          }
+          obstacle.lane = newLane;
+          obstacle.type = newType;
+          
+          const yPos = newType === "low" ? 0.7 : newType === "high" ? 1.0 : 0.5;
+          child.position.x = lanePositions[newLane];
+          child.position.y = yPos;
         }
         
         const distanceToPlayer = Math.abs(child.position.z);
@@ -88,13 +86,17 @@ export function Obstacles() {
           if (obstacle.lane === currentLane) {
             let shouldHit = false;
             
-            if (obstacle.type === "barrier") {
-              shouldHit = true;
-            } else if (obstacle.type === "low" && playerAction !== "sliding") {
-              shouldHit = true;
-            } else if (obstacle.type === "high" && playerAction !== "jumping") {
-              shouldHit = true;
-            }
+            const playerTop = playerY + playerHeight / 2;
+            const playerBottom = playerY - playerHeight / 2;
+            
+            const obstacleY = child.position.y;
+            const obstacleHeight = obstacle.type === "low" ? 0.4 : obstacle.type === "high" ? 1.2 : 1.0;
+            const obstacleBottom = obstacleY - obstacleHeight / 2;
+            const obstacleTop = obstacleY + obstacleHeight / 2;
+            
+            const isColliding = !(playerTop < obstacleBottom || playerBottom > obstacleTop);
+            
+            shouldHit = isColliding;
             
             if (shouldHit) {
               obstacle.hit = true;
@@ -110,19 +112,23 @@ export function Obstacles() {
   return (
     <group ref={groupRef}>
       {obstacles.map((obstacle) => {
-        const height = obstacle.type === "low" ? 0.6 : obstacle.type === "high" ? 1.5 : 1.8;
-        const yPos = obstacle.type === "low" ? 0.3 : obstacle.type === "high" ? 1.2 : 0.9;
-        const width = obstacle.type === "low" ? 1.5 : 1;
+        const yPos = obstacle.type === "low" ? 0.7 : obstacle.type === "high" ? 1.0 : 0.5;
+        const scale = obstacle.type === "low" ? 0.4 : obstacle.type === "high" ? 1.2 : 1.0;
         
         return (
-          <mesh
+          <group
             key={obstacle.id}
             position={[lanePositions[obstacle.lane], yPos, obstacle.z]}
-            castShadow
           >
-            <boxGeometry args={[width, height, 1]} />
-            <meshStandardMaterial color="#F44336" />
-          </mesh>
+            <Suspense fallback={
+              <mesh castShadow>
+                <boxGeometry args={[1, 1.2, 1]} />
+                <meshStandardMaterial color="#F44336" />
+              </mesh>
+            }>
+              <VirusModel scale={scale} />
+            </Suspense>
+          </group>
         );
       })}
     </group>

@@ -6,6 +6,7 @@ import { Obstacles } from "./Obstacles";
 import { Collectibles } from "./Collectibles";
 import { SafeZone } from "./SafeZone";
 import { Camera } from "./Camera";
+import { Environment } from "./Environment";
 
 export function GameScene() {
   return (
@@ -19,12 +20,13 @@ export function GameScene() {
       }}
     >
       <color attach="background" args={["#87CEEB"]} />
-      <fog attach="fog" args={["#87CEEB", 10, 50]} />
+      <fog attach="fog" args={["#87CEEB", 10, 60]} />
       
       <Lights />
       <Camera />
       <Player />
       <Ground />
+      <Environment />
       <Obstacles />
       <Collectibles />
       <SafeZone />

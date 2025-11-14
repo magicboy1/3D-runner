@@ -53,18 +53,36 @@ export function Ground() {
           <mesh receiveShadow position={[0, 0, 0]}>
             <boxGeometry args={[15, 0.2, 15]} />
             <meshStandardMaterial 
-              color={index % 2 === 0 ? "#8BC34A" : "#9CCC65"} 
+              color="#616161"
+              roughness={0.8}
             />
           </mesh>
           
           <mesh position={[-4, 0.15, 0]}>
-            <boxGeometry args={[0.3, 0.3, 15]} />
-            <meshStandardMaterial color="#FFF" />
+            <boxGeometry args={[0.2, 0.3, 15]} />
+            <meshStandardMaterial 
+              color="#FFD700"
+              emissive="#FFD700"
+              emissiveIntensity={0.3}
+            />
           </mesh>
           <mesh position={[4, 0.15, 0]}>
-            <boxGeometry args={[0.3, 0.3, 15]} />
-            <meshStandardMaterial color="#FFF" />
+            <boxGeometry args={[0.2, 0.3, 15]} />
+            <meshStandardMaterial 
+              color="#FFD700"
+              emissive="#FFD700"
+              emissiveIntensity={0.3}
+            />
           </mesh>
+          
+          {index % 3 === 0 && (
+            <>
+              <mesh position={[0, 0.15, 0]}>
+                <boxGeometry args={[12, 0.05, 0.5]} />
+                <meshStandardMaterial color="#FFF" opacity={0.5} transparent />
+              </mesh>
+            </>
+          )}
         </group>
       ))}
     </group>

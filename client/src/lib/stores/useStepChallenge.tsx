@@ -17,6 +17,8 @@ interface GameState {
   distance: number;
   currentLane: Lane;
   playerAction: PlayerAction;
+  playerY: number;
+  playerHeight: number;
   message: Message | null;
   gameSpeed: number;
   multiplier: number;
@@ -27,6 +29,7 @@ interface GameState {
   jump: () => void;
   slide: () => void;
   resetAction: () => void;
+  setPlayerPosition: (y: number, height: number) => void;
   addScore: (points: number) => void;
   addDistance: (dist: number) => void;
   increaseSpeed: () => void;
@@ -42,6 +45,8 @@ export const useStepChallenge = create<GameState>()(
     distance: 0,
     currentLane: "center",
     playerAction: "running",
+    playerY: 0,
+    playerHeight: 1.2,
     message: null,
     gameSpeed: 12,
     multiplier: 1,
@@ -96,6 +101,10 @@ export const useStepChallenge = create<GameState>()(
     
     resetAction: () => {
       set({ playerAction: "running" });
+    },
+    
+    setPlayerPosition: (y: number, height: number) => {
+      set({ playerY: y, playerHeight: height });
     },
     
     addScore: (points: number) => {

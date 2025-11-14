@@ -1,13 +1,22 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, Suspense } from "react";
 import { useFrame } from "@react-three/fiber";
+import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import { useStepChallenge } from "@/lib/stores/useStepChallenge";
 
+function PlayerModel() {
+  const { scene } = useGLTF("/models/player.glb");
+  const clonedScene = scene.clone();
+  
+  return <primitive object={clonedScene} scale={0.8} />;
+}
+
 export function Player() {
-  const meshRef = useRef<THREE.Mesh>(null);
+  const groupRef = useRef<THREE.Group>(null);
   const currentLane = useStepChallenge((state) => state.currentLane);
   const playerAction = useStepChallenge((state) => state.playerAction);
   const resetAction = useStepChallenge((state) => state.resetAction);
+  const setPlayerPosition = useStepChallenge((state) => state.setPlayerPosition);
   
   const jumpVelocityRef = useRef(0);
   const isJumpingRef = useRef(false);
@@ -21,7 +30,7 @@ export function Player() {
   
   useEffect(() => {
     if (playerAction === "jumping" && !isJumpingRef.current) {
-      jumpVelocityRef.current = 0.35;
+      jumpVelocityRef.current = 0.45;
       isJumpingRef.current = true;
     } else if (playerAction === "sliding") {
       slideTimerRef.current = 0.5;
@@ -29,47 +38,56 @@ export function Player() {
   }, [playerAction]);
   
   useFrame((state, delta) => {
-    if (meshRef.current) {
+    if (groupRef.current) {
       const targetX = lanePositions[currentLane];
-      meshRef.current.position.x = THREE.MathUtils.lerp(
-        meshRef.current.position.x,
+      groupRef.current.position.x = THREE.MathUtils.lerp(
+        groupRef.current.position.x,
         targetX,
         0.2
       );
       
       if (isJumpingRef.current) {
-        meshRef.current.position.y += jumpVelocityRef.current;
+        groupRef.current.position.y += jumpVelocityRef.current;
         jumpVelocityRef.current -= 0.025;
         
-        if (meshRef.current.position.y <= 0.6) {
-          meshRef.current.position.y = 0.6;
+        if (groupRef.current.position.y <= 0) {
+          groupRef.current.position.y = 0;
           isJumpingRef.current = false;
           jumpVelocityRef.current = 0;
           resetAction();
         }
       } else if (slideTimerRef.current > 0) {
         slideTimerRef.current -= delta;
-        meshRef.current.scale.y = 0.5;
-        meshRef.current.position.y = 0.4;
+        groupRef.current.scale.y = 0.4;
+        groupRef.current.position.y = 0.2;
         
         if (slideTimerRef.current <= 0) {
-          meshRef.current.scale.y = 1;
-          meshRef.current.position.y = 0.6;
+          groupRef.current.scale.y = 1;
+          groupRef.current.position.y = 0;
           resetAction();
         }
       } else {
-        meshRef.current.position.y = 0.6;
-        meshRef.current.scale.y = 1;
+        groupRef.current.position.y = 0;
+        groupRef.current.scale.y = 1;
       }
       
-      meshRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 6) * 0.1;
+      const currentHeight = 1.2 * groupRef.current.scale.y;
+      setPlayerPosition(groupRef.current.position.y, currentHeight);
+      
+      groupRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 8) * 0.05;
     }
   });
   
   return (
-    <mesh ref={meshRef} position={[0, 0.6, 0]} castShadow>
-      <boxGeometry args={[0.8, 1.2, 0.8]} />
-      <meshStandardMaterial color="#4CAF50" />
-    </mesh>
+    <group ref={groupRef} position={[0, 0, 0]} castShadow>
+      <Suspense fallback={
+        <mesh position={[0, 0.6, 0]}>
+          <boxGeometry args={[0.8, 1.2, 0.8]} />
+          <meshStandardMaterial color="#4CAF50" />
+        </mesh>
+      }>
+        <PlayerModel />
+      </Suspense>
+    </group>
   );
 }

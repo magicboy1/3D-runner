@@ -1,5 +1,6 @@
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, Suspense } from "react";
 import { useFrame } from "@react-three/fiber";
+import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import { useStepChallenge } from "@/lib/stores/useStepChallenge";
 import { useAudio } from "@/lib/stores/useAudio";
@@ -22,19 +23,19 @@ const collectibleMessages: Record<CollectibleType, string> = {
   magnet: "مغناطيس العملات! 🧲"
 };
 
-const collectibleColors: Record<CollectibleType, string> = {
-  coin: "#FFD700",
-  lock: "#2196F3",
-  shield: "#9C27B0",
-  magnet: "#FF9800"
-};
-
 const collectiblePoints: Record<CollectibleType, number> = {
   coin: 10,
   lock: 25,
   shield: 25,
   magnet: 50
 };
+
+function CoinModel() {
+  const { scene } = useGLTF("/models/coin.glb");
+  const clonedScene = scene.clone();
+  
+  return <primitive object={clonedScene} scale={0.5} />;
+}
 
 export function Collectibles() {
   const groupRef = useRef<THREE.Group>(null);
@@ -47,7 +48,7 @@ export function Collectibles() {
   const collectibles = useMemo(() => {
     const collectibleList: Collectible[] = [];
     const lanes: ("left" | "center" | "right")[] = ["left", "center", "right"];
-    const types: CollectibleType[] = ["coin", "coin", "coin", "lock", "shield", "magnet"];
+    const types: CollectibleType[] = ["coin", "coin", "coin", "coin", "lock", "shield", "magnet"];
     
     for (let i = 0; i < 30; i++) {
       collectibleList.push({
@@ -72,14 +73,14 @@ export function Collectibles() {
   useFrame((state, delta) => {
     if (groupRef.current) {
       const lanes: ("left" | "center" | "right")[] = ["left", "center", "right"];
-      const types: CollectibleType[] = ["coin", "coin", "coin", "lock", "shield", "magnet"];
+      const types: CollectibleType[] = ["coin", "coin", "coin", "coin", "lock", "shield", "magnet"];
       
       groupRef.current.children.forEach((child, index) => {
         const collectible = collectibles[index];
         if (!collectible) return;
         
         child.position.z += gameSpeed * delta;
-        child.rotation.y += delta * 3;
+        child.rotation.y += delta * 4;
         
         if (!collectible.collected) {
           child.position.y = 1 + Math.sin(state.clock.elapsedTime * 3 + index) * 0.3;
@@ -93,12 +94,6 @@ export function Collectibles() {
           collectible.type = types[Math.floor(Math.random() * types.length)];
           child.visible = true;
           child.position.x = lanePositions[collectible.lane];
-          
-          const mesh = child as THREE.Mesh;
-          if (mesh.material && 'color' in mesh.material) {
-            (mesh.material as THREE.MeshStandardMaterial).color.set(collectibleColors[collectible.type]);
-            (mesh.material as THREE.MeshStandardMaterial).emissive.set(collectibleColors[collectible.type]);
-          }
         }
         
         const distanceToPlayer = Math.abs(child.position.z);
@@ -115,21 +110,46 @@ export function Collectibles() {
     }
   });
   
+  const getCollectibleMesh = (type: CollectibleType) => {
+    if (type === "coin") {
+      return <CoinModel />;
+    }
+    
+    const colors = {
+      lock: "#2196F3",
+      shield: "#9C27B0",
+      magnet: "#FF9800"
+    };
+    
+    return (
+      <mesh>
+        <octahedronGeometry args={[0.4, 0]} />
+        <meshStandardMaterial 
+          color={colors[type]}
+          emissive={colors[type]}
+          emissiveIntensity={0.5}
+        />
+      </mesh>
+    );
+  };
+  
   return (
     <group ref={groupRef}>
       {collectibles.map((collectible) => (
-        <mesh
+        <group
           key={collectible.id}
           position={[lanePositions[collectible.lane], 1, collectible.z]}
           rotation={[0, collectible.rotation, 0]}
         >
-          <octahedronGeometry args={[0.4, 0]} />
-          <meshStandardMaterial 
-            color={collectibleColors[collectible.type]}
-            emissive={collectibleColors[collectible.type]}
-            emissiveIntensity={0.5}
-          />
-        </mesh>
+          <Suspense fallback={
+            <mesh>
+              <sphereGeometry args={[0.3]} />
+              <meshStandardMaterial color="#FFD700" />
+            </mesh>
+          }>
+            {getCollectibleMesh(collectible.type)}
+          </Suspense>
+        </group>
       ))}
     </group>
   );
