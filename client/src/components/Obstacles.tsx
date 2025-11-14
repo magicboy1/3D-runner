@@ -90,7 +90,7 @@ export function Obstacles() {
           obstacle.lane = newLane;
           obstacle.type = newType;
           
-          const yPos = newType === "low" ? 0.4 : newType === "high" ? 1.8 : 1.2;
+          const yPos = newType === "low" ? 0.2 : newType === "high" ? 1.8 : 1.2;
           child.position.x = lanePositions[newLane];
           child.position.y = yPos;
         }
@@ -135,7 +135,7 @@ export function Obstacles() {
   return (
     <group ref={groupRef}>
       {obstacles.map((obstacle) => {
-        const yPos = obstacle.type === "low" ? 0.4 : obstacle.type === "high" ? 1.8 : 1.2;
+        const yPos = obstacle.type === "low" ? 0.2 : obstacle.type === "high" ? 1.8 : 1.2;
         const scale = obstacle.type === "low" ? 0.4 : obstacle.type === "high" ? 1.2 : 1.0;
         
         return (
