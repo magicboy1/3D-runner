@@ -6,7 +6,7 @@ import { useStepChallenge } from "@/lib/stores/useStepChallenge";
 
 function PlayerModel() {
   const group = useRef<THREE.Group>(null);
-  const { scene } = useGLTF("/models/player.glb");
+  const { scene } = useGLTF("/models/hero_boy.glb");
   const clonedScene = scene.clone();
   const runPhase = useRef(0);
   
@@ -24,7 +24,7 @@ function PlayerModel() {
   
   return (
     <group ref={group} position={[0, 0, 0]}>
-      <primitive object={clonedScene} scale={1.5} />
+      <primitive object={clonedScene} scale={1.8} />
     </group>
   );
 }
