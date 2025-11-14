@@ -8,7 +8,9 @@ function PlayerModel() {
   const { scene } = useGLTF("/models/player.glb");
   const clonedScene = scene.clone();
   
-  return <primitive object={clonedScene} scale={0.8} />;
+  clonedScene.rotation.y = Math.PI;
+  
+  return <primitive object={clonedScene} scale={1.5} position={[0, 0.6, 0]} />;
 }
 
 export function Player() {
@@ -73,8 +75,6 @@ export function Player() {
       
       const currentHeight = 1.2 * groupRef.current.scale.y;
       setPlayerPosition(groupRef.current.position.y, currentHeight);
-      
-      groupRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 8) * 0.05;
     }
   });
   
