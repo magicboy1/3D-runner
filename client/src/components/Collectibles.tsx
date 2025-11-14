@@ -55,7 +55,7 @@ export function Collectibles() {
         id: i,
         type: types[Math.floor(Math.random() * types.length)],
         lane: lanes[Math.floor(Math.random() * lanes.length)],
-        z: -40 - (i * 15),
+        z: -50 - (i * 18),
         collected: false,
         rotation: Math.random() * Math.PI * 2
       });
@@ -65,9 +65,9 @@ export function Collectibles() {
   }, []);
   
   const lanePositions = {
-    left: -4,
+    left: -3,
     center: 0,
-    right: 4
+    right: 3
   };
   
   useFrame((state, delta) => {

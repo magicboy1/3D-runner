@@ -41,7 +41,7 @@ export function Obstacles() {
         id: i,
         type: types[Math.floor(Math.random() * types.length)],
         lane: lanes[Math.floor(Math.random() * lanes.length)],
-        z: -30 - (i * 20),
+        z: -40 - (i * 22),
         hit: false
       });
     }
@@ -50,9 +50,9 @@ export function Obstacles() {
   }, []);
   
   const lanePositions = {
-    left: -4,
+    left: -3,
     center: 0,
-    right: 4
+    right: 3
   };
   
   useFrame((state, delta) => {
