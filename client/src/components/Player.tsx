@@ -87,7 +87,8 @@ export function Player() {
       }
       
       const currentHeight = 1.2 * groupRef.current.scale.y;
-      setPlayerPosition(groupRef.current.position.y, currentHeight);
+      const actualY = groupRef.current.position.y + 1.2;
+      setPlayerPosition(actualY, currentHeight);
     }
   });
   
