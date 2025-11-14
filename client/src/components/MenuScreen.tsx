@@ -1,11 +1,24 @@
 import { useStepChallenge } from "@/lib/stores/useStepChallenge";
+import { useAudio } from "@/lib/stores/useAudio";
 import { Button } from "./ui/button";
+import { Volume2, VolumeX } from "lucide-react";
 
 export function MenuScreen() {
   const start = useStepChallenge((state) => state.start);
+  const isMuted = useAudio((state) => state.isMuted);
+  const toggleMute = useAudio((state) => state.toggleMute);
   
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-b from-blue-400 to-green-400 z-50">
+      <Button 
+        onClick={toggleMute}
+        variant="secondary"
+        size="icon"
+        className="absolute top-4 right-4 rounded-full shadow-lg"
+      >
+        {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+      </Button>
+      
       <div className="text-center px-4">
         <h1 className="text-6xl font-bold text-white mb-4 drop-shadow-lg" dir="rtl">
           عداء الأمان الرقمي
