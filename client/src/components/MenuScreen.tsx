@@ -41,7 +41,7 @@ export function MenuScreen() {
           </h2>
         </div>
         
-        <div className="relative mb-12">
+        <div className="relative mb-12 -ml-20 lg:-ml-32">
           <img 
             src="/images/hero-character.png" 
             alt="Hero Character" 
