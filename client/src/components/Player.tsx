@@ -29,7 +29,7 @@ function PlayerModel() {
       
       if (group.current) {
         const bounce = Math.abs(Math.sin(runningPhase.current)) * 0.08;
-        group.current.position.y = bounce;
+        group.current.position.y = 0.8 + bounce;
         
         const tilt = Math.sin(runningPhase.current) * 0.08;
         group.current.rotation.x = tilt - 0.1;
@@ -41,7 +41,7 @@ function PlayerModel() {
   });
   
   return (
-    <group ref={group} position={[0, 0.8, 0]}>
+    <group ref={group} position={[0, 0, 0]}>
       <primitive ref={modelRef} object={scene} scale={1.5} />
     </group>
   );
