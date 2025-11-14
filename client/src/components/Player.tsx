@@ -1,21 +1,28 @@
 import { useRef, useEffect, Suspense } from "react";
 import { useFrame } from "@react-three/fiber";
-import { useGLTF } from "@react-three/drei";
+import { useGLTF, useAnimations } from "@react-three/drei";
 import * as THREE from "three";
 import { useStepChallenge } from "@/lib/stores/useStepChallenge";
 
-function PlayerModel({ isRunning, animationPhase }: { isRunning: boolean, animationPhase: number }) {
-  const { scene } = useGLTF("/models/player.glb");
-  const clonedScene = scene.clone();
+function PlayerModel() {
+  const group = useRef<THREE.Group>(null);
+  const { scene, animations } = useGLTF("/models/player.glb");
+  const { actions } = useAnimations(animations, group);
   
-  clonedScene.rotation.y = 0;
+  useEffect(() => {
+    if (actions && Object.keys(actions).length > 0) {
+      const firstAction = Object.values(actions)[0];
+      if (firstAction) {
+        firstAction.play();
+      }
+    }
+  }, [actions]);
   
-  if (isRunning) {
-    clonedScene.rotation.x = Math.sin(animationPhase * 10) * 0.05;
-    clonedScene.position.y = Math.abs(Math.sin(animationPhase * 10)) * 0.1;
-  }
-  
-  return <primitive object={clonedScene} scale={1.5} position={[0, 0, 0]} />;
+  return (
+    <group ref={group}>
+      <primitive object={scene} scale={1.5} />
+    </group>
+  );
 }
 
 export function Player() {
@@ -28,7 +35,6 @@ export function Player() {
   const jumpVelocityRef = useRef(0);
   const isJumpingRef = useRef(false);
   const slideTimerRef = useRef(0);
-  const animationPhaseRef = useRef(0);
   
   const lanePositions = {
     left: -4,
@@ -47,8 +53,6 @@ export function Player() {
   
   useFrame((state, delta) => {
     if (groupRef.current) {
-      animationPhaseRef.current += delta;
-      
       const targetX = lanePositions[currentLane];
       groupRef.current.position.x = THREE.MathUtils.lerp(
         groupRef.current.position.x,
@@ -94,7 +98,7 @@ export function Player() {
           <meshStandardMaterial color="#4CAF50" />
         </mesh>
       }>
-        <PlayerModel isRunning={true} animationPhase={animationPhaseRef.current} />
+        <PlayerModel />
       </Suspense>
     </group>
   );
