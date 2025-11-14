@@ -82,27 +82,33 @@ export function Obstacles() {
         }
         
         const distanceToPlayer = Math.abs(child.position.z);
-        if (distanceToPlayer < 1.5 && !obstacle.hit) {
-          if (obstacle.lane === currentLane) {
-            let shouldHit = false;
-            
-            const playerTop = playerY + playerHeight / 2;
-            const playerBottom = playerY - playerHeight / 2;
-            
-            const obstacleY = child.position.y;
-            const obstacleHeight = obstacle.type === "low" ? 0.4 : obstacle.type === "high" ? 1.2 : 1.0;
-            const obstacleBottom = obstacleY - obstacleHeight / 2;
-            const obstacleTop = obstacleY + obstacleHeight / 2;
-            
-            const isColliding = !(playerTop < obstacleBottom || playerBottom > obstacleTop);
-            
-            shouldHit = isColliding;
-            
-            if (shouldHit) {
-              obstacle.hit = true;
-              playHit();
-              gameOver();
-            }
+        if (distanceToPlayer < 1.5 && !obstacle.hit && obstacle.lane === currentLane) {
+          const playerTop = playerY + playerHeight / 2;
+          const playerBottom = playerY - playerHeight / 2;
+          
+          const obstacleY = child.position.y;
+          const obstacleHeight = obstacle.type === "low" ? 0.4 : obstacle.type === "high" ? 1.2 : 1.0;
+          const obstacleBottom = obstacleY - obstacleHeight / 2;
+          const obstacleTop = obstacleY + obstacleHeight / 2;
+          
+          const isColliding = !(playerTop < obstacleBottom || playerBottom > obstacleTop);
+          
+          if (isColliding) {
+            console.log("Collision detected!", {
+              lane: obstacle.lane,
+              currentLane,
+              playerY,
+              playerHeight,
+              playerTop,
+              playerBottom,
+              obstacleY,
+              obstacleBottom,
+              obstacleTop,
+              type: obstacle.type
+            });
+            obstacle.hit = true;
+            playHit();
+            gameOver();
           }
         }
       });
