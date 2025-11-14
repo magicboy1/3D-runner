@@ -1,0 +1,33 @@
+import { Canvas } from "@react-three/fiber";
+import { Player } from "./Player";
+import { Ground } from "./Ground";
+import { Lights } from "./Lights";
+import { Obstacles } from "./Obstacles";
+import { Collectibles } from "./Collectibles";
+import { SafeZone } from "./SafeZone";
+import { Camera } from "./Camera";
+
+export function GameScene() {
+  return (
+    <Canvas
+      shadows
+      camera={{
+        position: [0, 4, 8],
+        fov: 60,
+        near: 0.1,
+        far: 1000
+      }}
+    >
+      <color attach="background" args={["#87CEEB"]} />
+      <fog attach="fog" args={["#87CEEB", 10, 50]} />
+      
+      <Lights />
+      <Camera />
+      <Player />
+      <Ground />
+      <Obstacles />
+      <Collectibles />
+      <SafeZone />
+    </Canvas>
+  );
+}
