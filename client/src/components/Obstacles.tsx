@@ -70,7 +70,21 @@ export function Obstacles() {
           
           const lanes: ("left" | "center" | "right")[] = ["left", "center", "right"];
           const types: ObstacleType[] = ["barrier", "low", "high"];
-          const newLane = lanes[Math.floor(Math.random() * lanes.length)];
+          
+          const nearbyObstacles = obstacles.filter((obs, idx) => {
+            if (idx === index) return false;
+            const otherChild = groupRef.current?.children[idx];
+            if (!otherChild) return false;
+            const zDiff = Math.abs(otherChild.position.z - (-500));
+            return zDiff < 30;
+          });
+          
+          const occupiedLanes = nearbyObstacles.map(obs => obs.lane);
+          const availableLanes = lanes.filter(lane => !occupiedLanes.includes(lane));
+          
+          const newLane = availableLanes.length > 0 
+            ? availableLanes[Math.floor(Math.random() * availableLanes.length)]
+            : lanes[Math.floor(Math.random() * lanes.length)];
           const newType = types[Math.floor(Math.random() * types.length)];
           
           obstacle.lane = newLane;
