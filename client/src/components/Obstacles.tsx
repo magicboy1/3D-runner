@@ -69,20 +69,24 @@ export function Obstacles() {
           
           const lanes: ("left" | "center" | "right")[] = ["left", "center", "right"];
           
-          const nearbyObstacles = obstacles.filter((obs, idx) => {
+          const veryCloseObstacles = obstacles.filter((obs, idx) => {
             if (idx === index) return false;
             const otherChild = groupRef.current?.children[idx];
             if (!otherChild) return false;
             const zDiff = Math.abs(otherChild.position.z - (-500));
-            return zDiff < 30;
+            return zDiff < 10;
           });
           
-          const occupiedLanes = nearbyObstacles.map(obs => obs.lane);
-          const availableLanes = lanes.filter(lane => !occupiedLanes.includes(lane));
+          const occupiedLanes = veryCloseObstacles.map(obs => obs.lane);
           
-          const newLane = availableLanes.length > 0 
-            ? availableLanes[Math.floor(Math.random() * availableLanes.length)]
-            : lanes[Math.floor(Math.random() * lanes.length)];
+          let newLane: "left" | "center" | "right";
+          if (occupiedLanes.length >= 2) {
+            const freeLane = lanes.find(lane => !occupiedLanes.includes(lane));
+            newLane = freeLane || lanes[Math.floor(Math.random() * lanes.length)];
+          } else {
+            const availableLanes = lanes.filter(lane => !occupiedLanes.includes(lane));
+            newLane = availableLanes[Math.floor(Math.random() * availableLanes.length)];
+          }
           
           obstacle.lane = newLane;
           obstacle.type = "barrier";
