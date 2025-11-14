@@ -90,13 +90,15 @@ export function Obstacles() {
           obstacle.lane = newLane;
           obstacle.type = newType;
           
-          const yPos = newType === "low" ? 0.9 : newType === "high" ? 1.8 : 1.2;
+          const yPos = newType === "low" ? 0.4 : newType === "high" ? 1.8 : 1.2;
           child.position.x = lanePositions[newLane];
           child.position.y = yPos;
         }
         
         const distanceToPlayer = Math.abs(child.position.z);
-        if (distanceToPlayer < 1.5 && !obstacle.hit && obstacle.lane === currentLane) {
+        if (distanceToPlayer < 1.5 && !obstacle.hit) {
+          if (obstacle.lane !== currentLane) return;
+          
           const playerTop = playerY + playerHeight / 2;
           const playerBottom = playerY - playerHeight / 2;
           
@@ -105,9 +107,9 @@ export function Obstacles() {
           const obstacleBottom = obstacleY - obstacleHeight / 2;
           const obstacleTop = obstacleY + obstacleHeight / 2;
           
-          const isColliding = !(playerTop < obstacleBottom || playerBottom > obstacleTop);
+          const verticalOverlap = !(playerTop < obstacleBottom || playerBottom > obstacleTop);
           
-          if (isColliding) {
+          if (verticalOverlap) {
             console.log("Collision detected!", {
               lane: obstacle.lane,
               currentLane,
@@ -116,6 +118,7 @@ export function Obstacles() {
               playerTop,
               playerBottom,
               obstacleY,
+              obstacleHeight,
               obstacleBottom,
               obstacleTop,
               type: obstacle.type
@@ -132,7 +135,7 @@ export function Obstacles() {
   return (
     <group ref={groupRef}>
       {obstacles.map((obstacle) => {
-        const yPos = obstacle.type === "low" ? 0.9 : obstacle.type === "high" ? 1.8 : 1.2;
+        const yPos = obstacle.type === "low" ? 0.4 : obstacle.type === "high" ? 1.8 : 1.2;
         const scale = obstacle.type === "low" ? 0.4 : obstacle.type === "high" ? 1.2 : 1.0;
         
         return (
