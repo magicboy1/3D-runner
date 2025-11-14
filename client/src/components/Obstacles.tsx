@@ -34,12 +34,11 @@ export function Obstacles() {
   const obstacles = useMemo(() => {
     const obstacleList: Obstacle[] = [];
     const lanes: ("left" | "center" | "right")[] = ["left", "center", "right"];
-    const types: ObstacleType[] = ["barrier", "low", "high"];
     
     for (let i = 0; i < 25; i++) {
       obstacleList.push({
         id: i,
-        type: types[Math.floor(Math.random() * types.length)],
+        type: "barrier",
         lane: lanes[Math.floor(Math.random() * lanes.length)],
         z: -40 - (i * 22),
         hit: false
@@ -69,7 +68,6 @@ export function Obstacles() {
           obstacle.hit = false;
           
           const lanes: ("left" | "center" | "right")[] = ["left", "center", "right"];
-          const types: ObstacleType[] = ["barrier", "low", "high"];
           
           const nearbyObstacles = obstacles.filter((obs, idx) => {
             if (idx === index) return false;
@@ -85,14 +83,12 @@ export function Obstacles() {
           const newLane = availableLanes.length > 0 
             ? availableLanes[Math.floor(Math.random() * availableLanes.length)]
             : lanes[Math.floor(Math.random() * lanes.length)];
-          const newType = types[Math.floor(Math.random() * types.length)];
           
           obstacle.lane = newLane;
-          obstacle.type = newType;
+          obstacle.type = "barrier";
           
-          const yPos = newType === "low" ? 0.2 : newType === "high" ? 1.8 : 1.2;
           child.position.x = lanePositions[newLane];
-          child.position.y = yPos;
+          child.position.y = 1.2;
         }
         
         const distanceToPlayer = Math.abs(child.position.z);
@@ -103,7 +99,7 @@ export function Obstacles() {
           const playerBottom = playerY - playerHeight / 2;
           
           const obstacleY = child.position.y;
-          const obstacleHeight = obstacle.type === "low" ? 0.4 : obstacle.type === "high" ? 1.2 : 1.0;
+          const obstacleHeight = 1.0;
           const obstacleBottom = obstacleY - obstacleHeight / 2;
           const obstacleTop = obstacleY + obstacleHeight / 2;
           
@@ -135,8 +131,8 @@ export function Obstacles() {
   return (
     <group ref={groupRef}>
       {obstacles.map((obstacle) => {
-        const yPos = obstacle.type === "low" ? 0.2 : obstacle.type === "high" ? 1.8 : 1.2;
-        const scale = obstacle.type === "low" ? 0.4 : obstacle.type === "high" ? 1.2 : 1.0;
+        const yPos = 1.2;
+        const scale = 1.0;
         
         return (
           <group
