@@ -6,7 +6,7 @@ import { useStepChallenge } from "@/lib/stores/useStepChallenge";
 
 function PlayerModel() {
   const group = useRef<THREE.Group>(null);
-  const { scene } = useGLTF("/models/hero_boy.glb");
+  const { scene } = useGLTF("/models/player.glb");
   const clonedScene = scene.clone();
   const runPhase = useRef(0);
   
@@ -16,14 +16,12 @@ function PlayerModel() {
     if (group.current) {
       const bounce = Math.abs(Math.sin(runPhase.current)) * 0.03;
       group.current.position.y = 1.2 + bounce;
-      
-      group.current.rotation.y = 0;
     }
   });
   
   return (
     <group ref={group} position={[0, 0, 0]}>
-      <primitive object={clonedScene} scale={1.8} />
+      <primitive object={clonedScene} scale={1.5} />
     </group>
   );
 }
