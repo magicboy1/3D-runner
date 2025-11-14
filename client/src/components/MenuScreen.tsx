@@ -30,27 +30,18 @@ export function MenuScreen() {
       
       <div className="relative h-full flex flex-col items-center justify-center px-4 z-10">
         <div className="text-center mb-8">
-          <h1 className="text-5xl lg:text-7xl font-black mb-4" dir="rtl"
+          <h1 className="text-5xl lg:text-7xl font-black text-white drop-shadow-2xl mb-4" dir="rtl"
               style={{
-                background: 'linear-gradient(45deg, #FF6B9D 0%, #FEC163 25%, #4ECDC4 50%, #A8E6CF 75%, #FFD93D 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-                textShadow: '0 8px 0 rgba(0, 0, 0, 0.2)',
-                filter: 'drop-shadow(0 12px 20px rgba(0, 0, 0, 0.4)) drop-shadow(0 0 30px rgba(255, 255, 255, 0.3))',
-                transform: 'perspective(500px) rotateX(8deg)',
+                textShadow: '0 8px 0 rgba(0, 0, 0, 0.3), 0 12px 20px rgba(0, 0, 0, 0.5), 0 0 40px rgba(255, 255, 255, 0.2)',
+                transform: 'perspective(500px) rotateX(10deg)',
                 transformStyle: 'preserve-3d'
               }}>
             عداء الأمان الرقمي
           </h1>
-          <h2 className="text-2xl lg:text-4xl font-bold" dir="rtl"
+          <h2 className="text-2xl lg:text-4xl font-bold text-white/90 drop-shadow-lg" dir="rtl"
               style={{
-                background: 'linear-gradient(135deg, #FEC163 0%, #FF6B9D 50%, #4ECDC4 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-                filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3))',
-                transform: 'perspective(500px) rotateX(6deg)'
+                textShadow: '0 4px 0 rgba(0, 0, 0, 0.2), 0 6px 10px rgba(0, 0, 0, 0.4)',
+                transform: 'perspective(500px) rotateX(8deg)'
               }}>
             Digital Safety Runner
           </h2>
