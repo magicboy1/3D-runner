@@ -17,8 +17,7 @@ function PlayerModel() {
       const bounce = Math.abs(Math.sin(runPhase.current)) * 0.03;
       group.current.position.y = 1.2 + bounce;
       
-      const tilt = Math.sin(runPhase.current) * 0.02;
-      group.current.rotation.x = tilt;
+      group.current.rotation.y = 0;
     }
   });
   
