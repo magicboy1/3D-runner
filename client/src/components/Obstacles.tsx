@@ -1,4 +1,4 @@
-import { useRef, useMemo, useEffect } from "react";
+import { useRef, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { useStepChallenge } from "@/lib/stores/useStepChallenge";
@@ -13,7 +13,6 @@ interface Obstacle {
 
 export function Obstacles() {
   const groupRef = useRef<THREE.Group>(null);
-  const obstaclesRef = useRef<Obstacle[]>([]);
   const currentLane = useStepChallenge((state) => state.currentLane);
   const addScore = useStepChallenge((state) => state.addScore);
   const showMessage = useStepChallenge((state) => state.showMessage);
@@ -26,12 +25,12 @@ export function Obstacles() {
     "كن حذراً من الأخطار!",
   ], []);
   
-  useEffect(() => {
-    const obstacles: Obstacle[] = [];
+  const obstacles = useMemo(() => {
+    const obstacleList: Obstacle[] = [];
     const lanes: ("left" | "right")[] = ["left", "right"];
     
     for (let i = 0; i < 15; i++) {
-      obstacles.push({
+      obstacleList.push({
         id: i,
         lane: lanes[Math.floor(Math.random() * lanes.length)],
         z: -30 - (i * 15),
@@ -39,7 +38,7 @@ export function Obstacles() {
       });
     }
     
-    obstaclesRef.current = obstacles;
+    return obstacleList;
   }, []);
   
   const lanePositions = {
@@ -50,7 +49,7 @@ export function Obstacles() {
   useFrame(() => {
     if (groupRef.current) {
       groupRef.current.children.forEach((child, index) => {
-        const obstacle = obstaclesRef.current[index];
+        const obstacle = obstacles[index];
         if (!obstacle) return;
         
         child.position.z += speed * 0.016;
@@ -78,7 +77,7 @@ export function Obstacles() {
   
   return (
     <group ref={groupRef}>
-      {obstaclesRef.current.map((obstacle) => (
+      {obstacles.map((obstacle) => (
         <mesh
           key={obstacle.id}
           position={[lanePositions[obstacle.lane], 0.5, obstacle.z]}
