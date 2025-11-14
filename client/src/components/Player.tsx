@@ -19,7 +19,7 @@ function PlayerModel() {
   }, [actions]);
   
   return (
-    <group ref={group}>
+    <group ref={group} position={[0, 0.8, 0]}>
       <primitive object={scene} scale={1.5} />
     </group>
   );
