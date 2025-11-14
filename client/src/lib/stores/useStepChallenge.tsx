@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
 
-export type GamePhase = "menu" | "playing" | "gameover";
+export type GamePhase = "menu" | "playing" | "gameover" | "victory";
 export type Lane = "left" | "center" | "right";
 export type PlayerAction = "running" | "jumping" | "sliding";
 
@@ -36,6 +36,7 @@ interface GameState {
   showMessage: (text: string, type: "warning" | "success") => void;
   clearMessage: () => void;
   gameOver: () => void;
+  victory: () => void;
 }
 
 export const useStepChallenge = create<GameState>()(
@@ -114,7 +115,13 @@ export const useStepChallenge = create<GameState>()(
     },
     
     addDistance: (dist: number) => {
-      set((state) => ({ distance: state.distance + dist }));
+      set((state) => {
+        const newDistance = state.distance + dist;
+        if (newDistance >= 1000 && state.phase === "playing") {
+          return { distance: newDistance, phase: "victory" };
+        }
+        return { distance: newDistance };
+      });
     },
     
     increaseSpeed: () => {
@@ -133,6 +140,10 @@ export const useStepChallenge = create<GameState>()(
     
     gameOver: () => {
       set({ phase: "gameover" });
+    },
+    
+    victory: () => {
+      set({ phase: "victory" });
     }
   }))
 );

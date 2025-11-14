@@ -5,6 +5,7 @@ import { GameScene } from "./GameScene";
 import { GameUI } from "./GameUI";
 import { MenuScreen } from "./MenuScreen";
 import { GameOverScreen } from "./GameOverScreen";
+import { VictoryScreen } from "./VictoryScreen";
 import { SoundManager } from "./SoundManager";
 import { TouchControls } from "./TouchControls";
 
@@ -59,6 +60,7 @@ export function Game() {
       
       {phase === "menu" && <MenuScreen />}
       {phase === "gameover" && <GameOverScreen />}
+      {phase === "victory" && <VictoryScreen />}
       
       {phase === "playing" && (
         <>
