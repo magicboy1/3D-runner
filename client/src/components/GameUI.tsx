@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 import { useStepChallenge } from "@/lib/stores/useStepChallenge";
+import { useAudio } from "@/lib/stores/useAudio";
 import { Button } from "./ui/button";
-import { Pause } from "lucide-react";
+import { Pause, Volume2, VolumeX } from "lucide-react";
 
 export function GameUI() {
   const score = useStepChallenge((state) => state.score);
@@ -9,6 +10,8 @@ export function GameUI() {
   const message = useStepChallenge((state) => state.message);
   const restart = useStepChallenge((state) => state.restart);
   const clearMessage = useStepChallenge((state) => state.clearMessage);
+  const isMuted = useAudio((state) => state.isMuted);
+  const toggleMute = useAudio((state) => state.toggleMute);
   
   useEffect(() => {
     if (message) {
@@ -32,14 +35,25 @@ export function GameUI() {
             </div>
           </div>
           
-          <Button 
-            onClick={restart}
-            variant="destructive"
-            size="icon"
-            className="rounded-full shadow-lg"
-          >
-            <Pause className="h-5 w-5" />
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              onClick={toggleMute}
+              variant="secondary"
+              size="icon"
+              className="rounded-full shadow-lg"
+            >
+              {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+            </Button>
+            
+            <Button 
+              onClick={restart}
+              variant="destructive"
+              size="icon"
+              className="rounded-full shadow-lg"
+            >
+              <Pause className="h-5 w-5" />
+            </Button>
+          </div>
         </div>
         
         {message && (
