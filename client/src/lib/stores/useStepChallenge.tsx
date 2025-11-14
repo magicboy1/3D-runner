@@ -1,8 +1,9 @@
 import { create } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
 
-export type GamePhase = "menu" | "playing" | "victory";
-export type Lane = "left" | "right";
+export type GamePhase = "menu" | "playing" | "gameover";
+export type Lane = "left" | "center" | "right";
+export type PlayerAction = "running" | "jumping" | "sliding";
 
 interface Message {
   text: string;
@@ -13,35 +14,48 @@ interface Message {
 interface GameState {
   phase: GamePhase;
   score: number;
-  progress: number;
+  distance: number;
   currentLane: Lane;
+  playerAction: PlayerAction;
   message: Message | null;
+  gameSpeed: number;
+  multiplier: number;
   
   start: () => void;
   restart: () => void;
   switchLane: (lane: Lane) => void;
+  jump: () => void;
+  slide: () => void;
+  resetAction: () => void;
   addScore: (points: number) => void;
-  updateProgress: (progress: number) => void;
+  addDistance: (dist: number) => void;
+  increaseSpeed: () => void;
   showMessage: (text: string, type: "warning" | "success") => void;
   clearMessage: () => void;
-  victory: () => void;
+  gameOver: () => void;
 }
 
 export const useStepChallenge = create<GameState>()(
   subscribeWithSelector((set) => ({
     phase: "menu",
     score: 0,
-    progress: 0,
-    currentLane: "left",
+    distance: 0,
+    currentLane: "center",
+    playerAction: "running",
     message: null,
+    gameSpeed: 12,
+    multiplier: 1,
     
     start: () => {
       set({ 
         phase: "playing", 
-        score: 0, 
-        progress: 0,
-        currentLane: "left",
-        message: null
+        score: 0,
+        distance: 0,
+        currentLane: "center",
+        playerAction: "running",
+        message: null,
+        gameSpeed: 12,
+        multiplier: 1
       });
     },
     
@@ -49,9 +63,12 @@ export const useStepChallenge = create<GameState>()(
       set({ 
         phase: "menu",
         score: 0,
-        progress: 0,
-        currentLane: "left",
-        message: null
+        distance: 0,
+        currentLane: "center",
+        playerAction: "running",
+        message: null,
+        gameSpeed: 12,
+        multiplier: 1
       });
     },
     
@@ -59,12 +76,42 @@ export const useStepChallenge = create<GameState>()(
       set({ currentLane: lane });
     },
     
-    addScore: (points: number) => {
-      set((state) => ({ score: state.score + points }));
+    jump: () => {
+      set((state) => {
+        if (state.playerAction === "running") {
+          return { playerAction: "jumping" };
+        }
+        return {};
+      });
     },
     
-    updateProgress: (progress: number) => {
-      set({ progress });
+    slide: () => {
+      set((state) => {
+        if (state.playerAction === "running") {
+          return { playerAction: "sliding" };
+        }
+        return {};
+      });
+    },
+    
+    resetAction: () => {
+      set({ playerAction: "running" });
+    },
+    
+    addScore: (points: number) => {
+      set((state) => ({ 
+        score: state.score + (points * state.multiplier)
+      }));
+    },
+    
+    addDistance: (dist: number) => {
+      set((state) => ({ distance: state.distance + dist }));
+    },
+    
+    increaseSpeed: () => {
+      set((state) => ({ 
+        gameSpeed: Math.min(state.gameSpeed + 0.5, 25)
+      }));
     },
     
     showMessage: (text: string, type: "warning" | "success") => {
@@ -75,8 +122,8 @@ export const useStepChallenge = create<GameState>()(
       set({ message: null });
     },
     
-    victory: () => {
-      set({ phase: "victory" });
+    gameOver: () => {
+      set({ phase: "gameover" });
     }
   }))
 );

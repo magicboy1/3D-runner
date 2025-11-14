@@ -4,9 +4,12 @@ import * as THREE from "three";
 import { useStepChallenge } from "@/lib/stores/useStepChallenge";
 import { useAudio } from "@/lib/stores/useAudio";
 
+type ObstacleType = "barrier" | "low" | "high";
+
 interface Obstacle {
   id: number;
-  lane: "left" | "right";
+  type: ObstacleType;
+  lane: "left" | "center" | "right";
   z: number;
   hit: boolean;
 }
@@ -14,10 +17,10 @@ interface Obstacle {
 export function Obstacles() {
   const groupRef = useRef<THREE.Group>(null);
   const currentLane = useStepChallenge((state) => state.currentLane);
-  const addScore = useStepChallenge((state) => state.addScore);
-  const showMessage = useStepChallenge((state) => state.showMessage);
+  const playerAction = useStepChallenge((state) => state.playerAction);
+  const gameOver = useStepChallenge((state) => state.gameOver);
+  const gameSpeed = useStepChallenge((state) => state.gameSpeed);
   const playHit = useAudio((state) => state.playHit);
-  const speed = 5;
   
   const warningMessages = useMemo(() => [
     "حاول تتفادى الخطر في المرة الجاية!",
@@ -27,13 +30,15 @@ export function Obstacles() {
   
   const obstacles = useMemo(() => {
     const obstacleList: Obstacle[] = [];
-    const lanes: ("left" | "right")[] = ["left", "right"];
+    const lanes: ("left" | "center" | "right")[] = ["left", "center", "right"];
+    const types: ObstacleType[] = ["barrier", "low", "high"];
     
-    for (let i = 0; i < 15; i++) {
+    for (let i = 0; i < 25; i++) {
       obstacleList.push({
         id: i,
+        type: types[Math.floor(Math.random() * types.length)],
         lane: lanes[Math.floor(Math.random() * lanes.length)],
-        z: -30 - (i * 15),
+        z: -30 - (i * 20),
         hit: false
       });
     }
@@ -42,33 +47,60 @@ export function Obstacles() {
   }, []);
   
   const lanePositions = {
-    left: -2,
-    right: 2
+    left: -4,
+    center: 0,
+    right: 4
   };
   
-  useFrame(() => {
+  useFrame((state, delta) => {
     if (groupRef.current) {
       groupRef.current.children.forEach((child, index) => {
         const obstacle = obstacles[index];
         if (!obstacle) return;
         
-        child.position.z += speed * 0.016;
+        child.position.z += gameSpeed * delta;
         
-        if (child.position.z > 10) {
-          child.position.z = -250;
+        if (child.position.z > 15) {
+          child.position.z = -500;
           obstacle.hit = false;
+          
+          const lanes: ("left" | "center" | "right")[] = ["left", "center", "right"];
+          const types: ObstacleType[] = ["barrier", "low", "high"];
+          obstacle.lane = lanes[Math.floor(Math.random() * lanes.length)];
+          obstacle.type = types[Math.floor(Math.random() * types.length)];
+          child.position.x = lanePositions[obstacle.lane];
+          
+          const mesh = child as THREE.Mesh;
+          if (obstacle.type === "low") {
+            mesh.scale.set(1.5, 0.6, 1);
+            mesh.position.y = 0.3;
+          } else if (obstacle.type === "high") {
+            mesh.scale.set(1, 1.5, 1);
+            mesh.position.y = 1.2;
+          } else {
+            mesh.scale.set(1, 1.8, 1);
+            mesh.position.y = 0.9;
+          }
         }
         
         const distanceToPlayer = Math.abs(child.position.z);
-        if (distanceToPlayer < 1 && !obstacle.hit) {
+        if (distanceToPlayer < 1.5 && !obstacle.hit) {
           if (obstacle.lane === currentLane) {
-            obstacle.hit = true;
-            addScore(-1);
-            playHit();
-            showMessage(
-              warningMessages[Math.floor(Math.random() * warningMessages.length)],
-              "warning"
-            );
+            let shouldHit = false;
+            
+            if (obstacle.type === "barrier") {
+              shouldHit = true;
+            } else if (obstacle.type === "low" && playerAction !== "sliding") {
+              shouldHit = true;
+            } else if (obstacle.type === "high" && playerAction !== "jumping") {
+              shouldHit = true;
+            }
+            
+            if (shouldHit) {
+              obstacle.hit = true;
+              playHit();
+              gameOver();
+            }
           }
         }
       });
@@ -77,16 +109,22 @@ export function Obstacles() {
   
   return (
     <group ref={groupRef}>
-      {obstacles.map((obstacle) => (
-        <mesh
-          key={obstacle.id}
-          position={[lanePositions[obstacle.lane], 0.5, obstacle.z]}
-          castShadow
-        >
-          <boxGeometry args={[0.8, 1, 0.8]} />
-          <meshStandardMaterial color="#F44336" />
-        </mesh>
-      ))}
+      {obstacles.map((obstacle) => {
+        const height = obstacle.type === "low" ? 0.6 : obstacle.type === "high" ? 1.5 : 1.8;
+        const yPos = obstacle.type === "low" ? 0.3 : obstacle.type === "high" ? 1.2 : 0.9;
+        const width = obstacle.type === "low" ? 1.5 : 1;
+        
+        return (
+          <mesh
+            key={obstacle.id}
+            position={[lanePositions[obstacle.lane], yPos, obstacle.z]}
+            castShadow
+          >
+            <boxGeometry args={[width, height, 1]} />
+            <meshStandardMaterial color="#F44336" />
+          </mesh>
+        );
+      })}
     </group>
   );
 }

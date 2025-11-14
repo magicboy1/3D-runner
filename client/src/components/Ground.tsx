@@ -1,17 +1,22 @@
 import { useRef, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
+import { useStepChallenge } from "@/lib/stores/useStepChallenge";
 
 export function Ground() {
   const groupRef = useRef<THREE.Group>(null);
-  const speed = 5;
+  const gameSpeed = useStepChallenge((state) => state.gameSpeed);
+  const addDistance = useStepChallenge((state) => state.addDistance);
+  const increaseSpeed = useStepChallenge((state) => state.increaseSpeed);
+  
+  const distanceCounterRef = useRef(0);
   
   const tiles = useMemo(() => {
     const tileList = [];
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 30; i++) {
       tileList.push({
         id: i,
-        z: i * 10
+        z: i * 15
       });
     }
     return tileList;
@@ -20,24 +25,47 @@ export function Ground() {
   useFrame((state, delta) => {
     if (groupRef.current) {
       groupRef.current.children.forEach((tile) => {
-        tile.position.z += speed * delta;
+        tile.position.z += gameSpeed * delta;
         
-        if (tile.position.z > 10) {
-          tile.position.z -= 200;
+        if (tile.position.z > 20) {
+          tile.position.z -= 450;
         }
       });
+      
+      distanceCounterRef.current += gameSpeed * delta;
+      if (distanceCounterRef.current >= 1) {
+        addDistance(Math.floor(distanceCounterRef.current));
+        distanceCounterRef.current = distanceCounterRef.current % 1;
+      }
+      
+      if (Math.floor(state.clock.elapsedTime) % 10 === 0 && Math.floor(state.clock.elapsedTime) > 0) {
+        if (state.clock.elapsedTime % 10 < delta) {
+          increaseSpeed();
+        }
+      }
     }
   });
   
   return (
     <group ref={groupRef}>
       {tiles.map((tile, index) => (
-        <mesh key={tile.id} position={[0, 0, -tile.z]} receiveShadow>
-          <boxGeometry args={[10, 0.2, 10]} />
-          <meshStandardMaterial 
-            color={index % 2 === 0 ? "#8BC34A" : "#9CCC65"} 
-          />
-        </mesh>
+        <group key={tile.id} position={[0, 0, -tile.z]}>
+          <mesh receiveShadow position={[0, 0, 0]}>
+            <boxGeometry args={[15, 0.2, 15]} />
+            <meshStandardMaterial 
+              color={index % 2 === 0 ? "#8BC34A" : "#9CCC65"} 
+            />
+          </mesh>
+          
+          <mesh position={[-4, 0.15, 0]}>
+            <boxGeometry args={[0.3, 0.3, 15]} />
+            <meshStandardMaterial color="#FFF" />
+          </mesh>
+          <mesh position={[4, 0.15, 0]}>
+            <boxGeometry args={[0.3, 0.3, 15]} />
+            <meshStandardMaterial color="#FFF" />
+          </mesh>
+        </group>
       ))}
     </group>
   );

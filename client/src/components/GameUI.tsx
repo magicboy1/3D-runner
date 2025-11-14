@@ -1,14 +1,14 @@
 import { useEffect } from "react";
 import { useStepChallenge } from "@/lib/stores/useStepChallenge";
 import { Button } from "./ui/button";
-import { Progress } from "./ui/progress";
-import { ChevronLeft, ChevronRight, Pause } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronUp, ChevronDown, Pause } from "lucide-react";
 
 export function GameUI() {
   const score = useStepChallenge((state) => state.score);
-  const progress = useStepChallenge((state) => state.progress);
+  const distance = useStepChallenge((state) => state.distance);
   const message = useStepChallenge((state) => state.message);
   const switchLane = useStepChallenge((state) => state.switchLane);
+  const currentLane = useStepChallenge((state) => state.currentLane);
   const restart = useStepChallenge((state) => state.restart);
   const clearMessage = useStepChallenge((state) => state.clearMessage);
   
@@ -16,23 +16,31 @@ export function GameUI() {
     if (message) {
       const timer = setTimeout(() => {
         clearMessage();
-      }, 3000);
+      }, 2000);
       return () => clearTimeout(timer);
     }
   }, [message, clearMessage]);
+  
+  const moveLeft = () => {
+    if (currentLane === "right") switchLane("center");
+    else if (currentLane === "center") switchLane("left");
+  };
+  
+  const moveRight = () => {
+    if (currentLane === "left") switchLane("center");
+    else if (currentLane === "center") switchLane("right");
+  };
   
   return (
     <div className="fixed inset-0 pointer-events-none">
       <div className="w-full h-full flex flex-col">
         <div className="flex items-start justify-between p-4 pointer-events-auto">
-          <div className="bg-white/90 backdrop-blur px-4 py-2 rounded-lg shadow-lg" dir="rtl">
-            <p className="text-xl font-bold text-gray-800">النقاط: {score}</p>
-          </div>
-          
-          <div className="flex-1 max-w-md mx-4">
-            <div className="bg-white/90 backdrop-blur px-4 py-2 rounded-lg shadow-lg">
-              <p className="text-sm text-gray-700 mb-1 text-center" dir="rtl">التقدم</p>
-              <Progress value={progress} className="h-3" />
+          <div className="flex flex-col gap-2">
+            <div className="bg-white/90 backdrop-blur px-4 py-2 rounded-lg shadow-lg" dir="rtl">
+              <p className="text-xl font-bold text-gray-800">النقاط: {score}</p>
+            </div>
+            <div className="bg-white/90 backdrop-blur px-4 py-2 rounded-lg shadow-lg" dir="rtl">
+              <p className="text-lg font-bold text-blue-600">{distance}م</p>
             </div>
           </div>
           
@@ -63,21 +71,38 @@ export function GameUI() {
         
         <div className="flex-1" />
         
-        <div className="flex justify-center gap-8 p-8 pointer-events-auto">
+        <div className="flex justify-center items-end gap-4 p-8 pointer-events-auto">
           <Button
-            onClick={() => switchLane("left")}
+            onClick={moveLeft}
             size="lg"
-            className="w-24 h-24 rounded-full bg-blue-500 hover:bg-blue-600 text-white shadow-xl"
+            className="w-20 h-20 rounded-full bg-blue-500 hover:bg-blue-600 text-white shadow-xl"
           >
-            <ChevronRight className="h-12 w-12" />
+            <ChevronRight className="h-10 w-10" />
           </Button>
           
+          <div className="flex flex-col gap-2">
+            <Button
+              onClick={() => useStepChallenge.getState().jump()}
+              size="lg"
+              className="w-20 h-20 rounded-full bg-green-500 hover:bg-green-600 text-white shadow-xl"
+            >
+              <ChevronUp className="h-10 w-10" />
+            </Button>
+            <Button
+              onClick={() => useStepChallenge.getState().slide()}
+              size="lg"
+              className="w-20 h-20 rounded-full bg-yellow-500 hover:bg-yellow-600 text-white shadow-xl"
+            >
+              <ChevronDown className="h-10 w-10" />
+            </Button>
+          </div>
+          
           <Button
-            onClick={() => switchLane("right")}
+            onClick={moveRight}
             size="lg"
-            className="w-24 h-24 rounded-full bg-blue-500 hover:bg-blue-600 text-white shadow-xl"
+            className="w-20 h-20 rounded-full bg-blue-500 hover:bg-blue-600 text-white shadow-xl"
           >
-            <ChevronLeft className="h-12 w-12" />
+            <ChevronLeft className="h-10 w-10" />
           </Button>
         </div>
       </div>
