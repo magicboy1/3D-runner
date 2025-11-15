@@ -1,4 +1,5 @@
 import { Canvas } from "@react-three/fiber";
+import { Suspense } from "react";
 import { Player } from "./Player";
 import { Ground } from "./Ground";
 import { Lights } from "./Lights";
@@ -8,8 +9,13 @@ import { SafeZone } from "./SafeZone";
 import { Camera } from "./Camera";
 import { Environment } from "./Environment";
 import { FinishLine } from "./FinishLine";
+import { LoadingScreen } from "./LoadingScreen";
 
-export function GameScene() {
+interface GameSceneProps {
+  onLoadComplete?: () => void;
+}
+
+export function GameScene({ onLoadComplete }: GameSceneProps) {
   return (
     <Canvas
       shadows
@@ -23,15 +29,19 @@ export function GameScene() {
       <color attach="background" args={["#87CEEB"]} />
       <fog attach="fog" args={["#87CEEB", 10, 60]} />
       
-      <Lights />
-      <Camera />
-      <Player />
-      <Ground />
-      <Environment />
-      <Obstacles />
-      <Collectibles />
-      <SafeZone />
-      <FinishLine />
+      {onLoadComplete && <LoadingScreen onLoadComplete={onLoadComplete} />}
+      
+      <Suspense fallback={null}>
+        <Lights />
+        <Camera />
+        <Player />
+        <Ground />
+        <Environment />
+        <Obstacles />
+        <Collectibles />
+        <SafeZone />
+        <FinishLine />
+      </Suspense>
     </Canvas>
   );
 }

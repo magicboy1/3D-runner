@@ -25,12 +25,9 @@ export function Game() {
   const slide = useStepChallenge((state) => state.slide);
   const [isLoading, setIsLoading] = useState(true);
   
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
-    return () => clearTimeout(timer);
-  }, []);
+  const handleLoadComplete = () => {
+    setIsLoading(false);
+  };
   
   const keyMap = [
     { name: Controls.left, keys: ["ArrowLeft", "KeyA"] },
@@ -62,23 +59,23 @@ export function Game() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [phase, switchLane, currentLane, jump, slide]);
   
-  if (isLoading) {
-    return <LoadingScreen />;
-  }
-  
   return (
     <KeyboardControls map={keyMap}>
       <SoundManager />
       <TouchControls />
       
-      {phase === "menu" && <MenuScreen />}
-      {phase === "gameover" && <GameOverScreen />}
+      <GameScene onLoadComplete={isLoading ? handleLoadComplete : undefined} />
       
-      {(phase === "playing" || phase === "victory") && (
+      {!isLoading && (
         <>
-          <GameScene />
-          <GameUI />
-          {phase === "victory" && <VictoryScreen />}
+          {phase === "menu" && <MenuScreen />}
+          {phase === "gameover" && <GameOverScreen />}
+          {(phase === "playing" || phase === "victory") && (
+            <>
+              <GameUI />
+              {phase === "victory" && <VictoryScreen />}
+            </>
+          )}
         </>
       )}
     </KeyboardControls>
