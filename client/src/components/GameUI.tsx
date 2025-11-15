@@ -77,7 +77,7 @@ export function GameUI() {
         </div>
         
         {message && (
-          <div className="flex justify-center mt-4 pointer-events-none">
+          <div className="absolute top-32 left-0 right-0 flex justify-center pointer-events-none">
             <div 
               className={`px-8 py-4 rounded-2xl shadow-2xl transform animate-bounce ${
                 message.type === "warning" 
