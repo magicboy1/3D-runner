@@ -45,7 +45,7 @@ function Cloud({ position }: { position: [number, number, number] }) {
 export function Environment() {
   const groupRef = useRef<THREE.Group>(null);
   const gameSpeed = useStepChallenge((state) => state.gameSpeed);
-  const distance = useStepChallenge((state) => state.distance);
+  const phase = useStepChallenge((state) => state.phase);
   
   const buildings = useMemo(() => {
     const buildingList = [];
@@ -89,11 +89,13 @@ export function Environment() {
   }, []);
   
   useFrame((state, delta) => {
-    if (distance >= 1000) return;
+    if (phase !== "playing" && phase !== "victory") return;
     
     if (groupRef.current) {
+      const speed = phase === "victory" ? gameSpeed * 0.4 : gameSpeed;
+      
       groupRef.current.children.forEach((child, index) => {
-        child.position.z += gameSpeed * delta;
+        child.position.z += speed * delta;
         
         if (child.position.z > 20) {
           child.position.z -= 1000;

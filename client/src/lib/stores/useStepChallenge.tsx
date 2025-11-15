@@ -49,7 +49,7 @@ export const useStepChallenge = create<GameState>()(
     playerY: 0,
     playerHeight: 1.2,
     message: null,
-    gameSpeed: 13,
+    gameSpeed: 15,
     multiplier: 1,
     
     start: () => {
@@ -60,7 +60,7 @@ export const useStepChallenge = create<GameState>()(
         currentLane: "center",
         playerAction: "running",
         message: null,
-        gameSpeed: 13,
+        gameSpeed: 15,
         multiplier: 1
       });
     },
@@ -73,7 +73,7 @@ export const useStepChallenge = create<GameState>()(
         currentLane: "center",
         playerAction: "running",
         message: null,
-        gameSpeed: 13,
+        gameSpeed: 15,
         multiplier: 1
       });
     },
