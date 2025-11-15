@@ -17,7 +17,7 @@ interface Obstacle {
 
 function VirusModel({ scale = 1 }: { scale?: number }) {
   const { scene } = useGLTF("/models/virus.glb");
-  const clonedScene = scene.clone();
+  const clonedScene = useMemo(() => scene.clone(), [scene]);
   
   return <primitive object={clonedScene} scale={scale} />;
 }
@@ -30,16 +30,18 @@ export function Obstacles() {
   const gameOver = useStepChallenge((state) => state.gameOver);
   const gameSpeed = useStepChallenge((state) => state.gameSpeed);
   const playHit = useAudio((state) => state.playHit);
+  const laneCounter = useRef(0);
   
   const obstacles = useMemo(() => {
     const obstacleList: Obstacle[] = [];
     const lanes: ("left" | "center" | "right")[] = ["left", "center", "right"];
+    const randomSeeds = [0.7, 0.3, 0.9, 0.2, 0.6, 0.1, 0.8, 0.4, 0.5, 0.95, 0.15, 0.75, 0.35, 0.65, 0.25, 0.85, 0.45, 0.55, 0.12, 0.88, 0.32, 0.72, 0.92, 0.52, 0.22];
     
     for (let i = 0; i < 25; i++) {
       obstacleList.push({
         id: i,
         type: "barrier",
-        lane: lanes[Math.floor(Math.random() * lanes.length)],
+        lane: lanes[Math.floor(randomSeeds[i] * lanes.length)],
         z: -40 - (i * 22),
         hit: false
       });
@@ -82,11 +84,12 @@ export function Obstacles() {
           let newLane: "left" | "center" | "right";
           if (occupiedLanes.length >= 2) {
             const freeLane = lanes.find(lane => !occupiedLanes.includes(lane));
-            newLane = freeLane || lanes[Math.floor(Math.random() * lanes.length)];
+            newLane = freeLane || lanes[laneCounter.current % lanes.length];
           } else {
             const availableLanes = lanes.filter(lane => !occupiedLanes.includes(lane));
-            newLane = availableLanes[Math.floor(Math.random() * availableLanes.length)];
+            newLane = availableLanes[laneCounter.current % availableLanes.length];
           }
+          laneCounter.current++;
           
           obstacle.lane = newLane;
           obstacle.type = "barrier";

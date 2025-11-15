@@ -1,4 +1,4 @@
-import { useRef, useEffect, Suspense } from "react";
+import { useRef, useEffect, useMemo, Suspense } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useGLTF, useAnimations } from "@react-three/drei";
 import * as THREE from "three";
@@ -7,7 +7,7 @@ import { useStepChallenge } from "@/lib/stores/useStepChallenge";
 function PlayerModel() {
   const group = useRef<THREE.Group>(null);
   const { scene } = useGLTF("/models/player.glb");
-  const clonedScene = scene.clone();
+  const clonedScene = useMemo(() => scene.clone(), [scene]);
   const runPhase = useRef(0);
   
   useFrame((state, delta) => {
@@ -36,12 +36,18 @@ export function Player() {
   const jumpVelocityRef = useRef(0);
   const isJumpingRef = useRef(false);
   const slideTimerRef = useRef(0);
+  const lastYRef = useRef(1.2);
+  const lastHeightRef = useRef(1.2);
   
   const lanePositions = {
     left: -3,
     center: 0,
     right: 3
   };
+  
+  useEffect(() => {
+    setPlayerPosition(1.2, 1.2);
+  }, [setPlayerPosition]);
   
   useEffect(() => {
     if (playerAction === "jumping" && !isJumpingRef.current) {
@@ -88,7 +94,12 @@ export function Player() {
       
       const currentHeight = 1.2 * groupRef.current.scale.y;
       const actualY = groupRef.current.position.y + 1.2;
-      setPlayerPosition(actualY, currentHeight);
+      
+      if (Math.abs(actualY - lastYRef.current) > 0.01 || Math.abs(currentHeight - lastHeightRef.current) > 0.01) {
+        setPlayerPosition(actualY, currentHeight);
+        lastYRef.current = actualY;
+        lastHeightRef.current = currentHeight;
+      }
     }
   });
   

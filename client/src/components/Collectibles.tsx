@@ -34,7 +34,7 @@ const collectiblePoints: Record<CollectibleType, number> = {
 
 function CoinModel() {
   const { scene } = useGLTF("/models/coin.glb");
-  const clonedScene = scene.clone();
+  const clonedScene = useMemo(() => scene.clone(), [scene]);
   
   return <primitive object={clonedScene} scale={0.5} />;
 }
@@ -46,20 +46,25 @@ export function Collectibles() {
   const showMessage = useStepChallenge((state) => state.showMessage);
   const gameSpeed = useStepChallenge((state) => state.gameSpeed);
   const playSuccess = useAudio((state) => state.playSuccess);
+  const laneCounter = useRef(0);
+  const typeCounter = useRef(0);
   
   const collectibles = useMemo(() => {
     const collectibleList: Collectible[] = [];
     const lanes: ("left" | "center" | "right")[] = ["left", "center", "right"];
     const types: CollectibleType[] = ["coin", "coin", "coin", "lock", "family", "privacy", "warning"];
+    const laneSeeds = [0, 1, 2, 1, 0, 2, 1, 0, 2, 0, 1, 2, 0, 1, 2, 1, 0, 2, 1, 0, 2, 1, 0, 2, 1, 0, 2, 1, 0, 2];
+    const typeSeeds = [0, 1, 2, 3, 4, 5, 6, 0, 1, 2, 3, 4, 5, 6, 0, 1, 2, 3, 4, 5, 6, 0, 1, 2, 3, 4, 5, 6, 0, 1];
+    const rotationSeeds = [0.5, 1.2, 2.8, 4.1, 5.3, 0.8, 1.9, 3.4, 4.7, 5.9, 0.3, 1.6, 2.9, 4.2, 5.5, 0.7, 1.4, 3.1, 4.5, 5.8, 0.2, 1.1, 2.7, 4.0, 5.4, 0.9, 1.8, 3.2, 4.8, 5.1];
     
     for (let i = 0; i < 30; i++) {
       collectibleList.push({
         id: i,
-        type: types[Math.floor(Math.random() * types.length)],
-        lane: lanes[Math.floor(Math.random() * lanes.length)],
+        type: types[typeSeeds[i] % types.length],
+        lane: lanes[laneSeeds[i] % lanes.length],
         z: -50 - (i * 18),
         collected: false,
-        rotation: Math.random() * Math.PI * 2
+        rotation: rotationSeeds[i]
       });
     }
     
@@ -92,8 +97,10 @@ export function Collectibles() {
         if (child.position.z > 15) {
           child.position.z = -500;
           collectible.collected = false;
-          collectible.lane = lanes[Math.floor(Math.random() * lanes.length)];
-          collectible.type = types[Math.floor(Math.random() * types.length)];
+          collectible.lane = lanes[laneCounter.current % lanes.length];
+          collectible.type = types[typeCounter.current % types.length];
+          laneCounter.current++;
+          typeCounter.current++;
           child.visible = true;
           child.position.x = lanePositions[collectible.lane];
         }
