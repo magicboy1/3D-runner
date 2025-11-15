@@ -6,6 +6,7 @@ import { useStepChallenge } from "@/lib/stores/useStepChallenge";
 export function Ground() {
   const groupRef = useRef<THREE.Group>(null);
   const gameSpeed = useStepChallenge((state) => state.gameSpeed);
+  const distance = useStepChallenge((state) => state.distance);
   const addDistance = useStepChallenge((state) => state.addDistance);
   const increaseSpeed = useStepChallenge((state) => state.increaseSpeed);
   
@@ -23,6 +24,8 @@ export function Ground() {
   }, []);
   
   useFrame((state, delta) => {
+    if (distance >= 1000) return;
+    
     if (groupRef.current) {
       groupRef.current.children.forEach((tile) => {
         tile.position.z += gameSpeed * delta;

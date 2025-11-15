@@ -6,11 +6,13 @@ import { useStepChallenge } from "@/lib/stores/useStepChallenge";
 export function Camera() {
   const { camera } = useThree();
   const gameSpeed = useStepChallenge((state) => state.gameSpeed);
+  const distance = useStepChallenge((state) => state.distance);
   
   const targetPosition = useRef(new THREE.Vector3());
   const targetLookAt = useRef(new THREE.Vector3(0, 0.9, -5));
   
   useFrame(() => {
+    if (distance >= 1000) return;
     const speedFactor = gameSpeed / 12;
     targetPosition.current.set(0, 3.2 + speedFactor * 0.5, 6 + speedFactor * 0.5);
     

@@ -58,27 +58,17 @@ export function Obstacles() {
   };
   
   useFrame((state, delta) => {
+    if (distance >= 1000) return;
+    
     if (groupRef.current) {
       groupRef.current.children.forEach((child, index) => {
         const obstacle = obstacles[index];
         if (!obstacle) return;
         
-        if (distance >= 1000) {
-          child.visible = false;
-          return;
-        }
-        
-        child.visible = true;
         child.position.z += gameSpeed * delta;
         child.rotation.y += delta * 2;
         
         if (child.position.z > 15) {
-          if (distance >= 1000) {
-            child.position.z = -2000;
-            child.position.y = -100;
-            return;
-          }
-          
           child.position.z = -500;
           obstacle.hit = false;
           
