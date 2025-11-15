@@ -8,8 +8,8 @@ export function Camera() {
   
   useFrame(() => {
     const speedFactor = gameSpeed / 12;
-    const targetPosition = new THREE.Vector3(0, 3.5 + speedFactor * 0.5, 7 + speedFactor * 0.5);
-    const targetLookAt = new THREE.Vector3(0, 1, -5);
+    const targetPosition = new THREE.Vector3(0, 3 + speedFactor * 0.5, 5 + speedFactor * 0.5);
+    const targetLookAt = new THREE.Vector3(0, 0.8, -5);
     
     camera.position.lerp(targetPosition, 0.03);
     camera.lookAt(targetLookAt);
