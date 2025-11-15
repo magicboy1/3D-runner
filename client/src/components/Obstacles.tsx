@@ -63,6 +63,12 @@ export function Obstacles() {
         const obstacle = obstacles[index];
         if (!obstacle) return;
         
+        if (distance >= 1000) {
+          child.visible = false;
+          return;
+        }
+        
+        child.visible = true;
         child.position.z += gameSpeed * delta;
         child.rotation.y += delta * 2;
         

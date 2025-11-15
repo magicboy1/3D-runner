@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { KeyboardControls } from "@react-three/drei";
 import { useStepChallenge } from "@/lib/stores/useStepChallenge";
 import { GameScene } from "./GameScene";
@@ -8,6 +8,7 @@ import { GameOverScreen } from "./GameOverScreen";
 import { VictoryScreen } from "./VictoryScreen";
 import { SoundManager } from "./SoundManager";
 import { TouchControls } from "./TouchControls";
+import { LoadingScreen } from "./LoadingScreen";
 
 enum Controls {
   left = "left",
@@ -22,6 +23,14 @@ export function Game() {
   const currentLane = useStepChallenge((state) => state.currentLane);
   const jump = useStepChallenge((state) => state.jump);
   const slide = useStepChallenge((state) => state.slide);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
   
   const keyMap = [
     { name: Controls.left, keys: ["ArrowLeft", "KeyA"] },
@@ -53,6 +62,10 @@ export function Game() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [phase, switchLane, currentLane, jump, slide]);
   
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
+  
   return (
     <KeyboardControls map={keyMap}>
       <SoundManager />
@@ -60,12 +73,12 @@ export function Game() {
       
       {phase === "menu" && <MenuScreen />}
       {phase === "gameover" && <GameOverScreen />}
-      {phase === "victory" && <VictoryScreen />}
       
-      {phase === "playing" && (
+      {(phase === "playing" || phase === "victory") && (
         <>
           <GameScene />
           <GameUI />
+          {phase === "victory" && <VictoryScreen />}
         </>
       )}
     </KeyboardControls>
