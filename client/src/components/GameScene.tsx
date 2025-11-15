@@ -7,6 +7,7 @@ import { Collectibles } from "./Collectibles";
 import { SafeZone } from "./SafeZone";
 import { Camera } from "./Camera";
 import { Environment } from "./Environment";
+import { FinishLine } from "./FinishLine";
 
 export function GameScene() {
   return (
@@ -30,6 +31,7 @@ export function GameScene() {
       <Obstacles />
       <Collectibles />
       <SafeZone />
+      <FinishLine />
     </Canvas>
   );
 }
