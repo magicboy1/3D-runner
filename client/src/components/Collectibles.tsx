@@ -42,6 +42,7 @@ function CoinModel() {
 export function Collectibles() {
   const groupRef = useRef<THREE.Group>(null);
   const currentLane = useStepChallenge((state) => state.currentLane);
+  const phase = useStepChallenge((state) => state.phase);
   const distance = useStepChallenge((state) => state.distance);
   const addScore = useStepChallenge((state) => state.addScore);
   const showMessage = useStepChallenge((state) => state.showMessage);
@@ -79,7 +80,7 @@ export function Collectibles() {
   };
   
   useFrame((state, delta) => {
-    if (distance >= 1000) return;
+    if (phase !== "playing") return;
     
     if (groupRef.current) {
       const lanes: ("left" | "center" | "right")[] = ["left", "center", "right"];

@@ -9,10 +9,10 @@ function PlayerModel() {
   const { scene } = useGLTF("/models/player.glb");
   const clonedScene = useMemo(() => scene.clone(), [scene]);
   const runPhase = useRef(0);
-  const distance = useStepChallenge((state) => state.distance);
+  const phase = useStepChallenge((state) => state.phase);
   
   useFrame((state, delta) => {
-    if (distance >= 1000) return;
+    if (phase !== "playing") return;
     
     runPhase.current += delta * 8;
     
@@ -32,7 +32,7 @@ function PlayerModel() {
 export function Player() {
   const groupRef = useRef<THREE.Group>(null);
   const currentLane = useStepChallenge((state) => state.currentLane);
-  const distance = useStepChallenge((state) => state.distance);
+  const phase = useStepChallenge((state) => state.phase);
   const playerAction = useStepChallenge((state) => state.playerAction);
   const resetAction = useStepChallenge((state) => state.resetAction);
   const setPlayerPosition = useStepChallenge((state) => state.setPlayerPosition);
@@ -63,7 +63,7 @@ export function Player() {
   }, [playerAction]);
   
   useFrame((state, delta) => {
-    if (distance >= 1000) return;
+    if (phase !== "playing") return;
     
     if (groupRef.current) {
       const targetX = lanePositions[currentLane];

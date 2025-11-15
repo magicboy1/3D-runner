@@ -7,6 +7,7 @@ export function Ground() {
   const groupRef = useRef<THREE.Group>(null);
   const gameSpeed = useStepChallenge((state) => state.gameSpeed);
   const distance = useStepChallenge((state) => state.distance);
+  const phase = useStepChallenge((state) => state.phase);
   const addDistance = useStepChallenge((state) => state.addDistance);
   const increaseSpeed = useStepChallenge((state) => state.increaseSpeed);
   
@@ -24,7 +25,7 @@ export function Ground() {
   }, []);
   
   useFrame((state, delta) => {
-    if (distance >= 1000) return;
+    if (phase !== "playing") return;
     
     if (groupRef.current) {
       groupRef.current.children.forEach((tile) => {

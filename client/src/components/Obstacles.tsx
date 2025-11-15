@@ -27,6 +27,7 @@ export function Obstacles() {
   const currentLane = useStepChallenge((state) => state.currentLane);
   const playerY = useStepChallenge((state) => state.playerY);
   const playerHeight = useStepChallenge((state) => state.playerHeight);
+  const phase = useStepChallenge((state) => state.phase);
   const distance = useStepChallenge((state) => state.distance);
   const gameOver = useStepChallenge((state) => state.gameOver);
   const gameSpeed = useStepChallenge((state) => state.gameSpeed);
@@ -58,7 +59,7 @@ export function Obstacles() {
   };
   
   useFrame((state, delta) => {
-    if (distance >= 1000) return;
+    if (phase !== "playing") return;
     
     if (groupRef.current) {
       groupRef.current.children.forEach((child, index) => {
