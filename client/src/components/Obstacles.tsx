@@ -95,8 +95,11 @@ export function Obstacles() {
           child.position.y = 1.2;
         }
         
-        const distanceToPlayer = Math.abs(child.position.z);
-        if (distanceToPlayer < 1.5 && !obstacle.hit) {
+        const obstacleZ = child.position.z;
+        const isAhead = obstacleZ < 0;
+        const distanceToPlayer = Math.abs(obstacleZ);
+        
+        if (isAhead && distanceToPlayer < 1.5 && !obstacle.hit) {
           if (obstacle.lane !== currentLane) return;
           
           const playerTop = playerY + playerHeight / 2;
