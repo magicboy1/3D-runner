@@ -29,9 +29,7 @@ export function FinishLine() {
   useFrame((state, delta) => {
     if (groupRef.current && meshRef.current) {
       const distanceToFinish = 1000 - distance;
-      const baseZ = -distanceToFinish;
-      
-      groupRef.current.position.z = baseZ + (gameSpeed * delta);
+      groupRef.current.position.z = -distanceToFinish;
       
       const targetY = Math.sin(Date.now() * 0.003) * 0.2;
       meshRef.current.position.y = 2 + targetY;
