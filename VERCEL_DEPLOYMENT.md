@@ -30,10 +30,13 @@ vercel --prod
 
 ## الإعدادات المهمة:
 
-### Build Settings
-- **Build Command**: `npm run build`
-- **Output Directory**: `dist/public`
-- **Install Command**: `npm install`
+### Build Settings في Vercel
+✅ **Build Command**: `vite build` (مش `npm run build`)
+✅ **Output Directory**: `dist/public`
+✅ **Install Command**: `npm install`
+✅ **Node Version**: 18.x أو أعلى
+
+**ملاحظة مهمة**: استخدم `vite build` فقط، مش `npm run build` لأننا نريد static site بدون server.
 
 ### Environment Variables (إذا كنت تستخدم قاعدة بيانات)
 قد تحتاج إلى إضافة:

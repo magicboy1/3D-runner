@@ -1,0 +1,43 @@
+03:48:33.814 Running build in Washington, D.C., USA (East) – iad1
+03:48:33.817 Build machine configuration: 2 cores, 8 GB
+03:48:34.072 Cloning github.com/magicboy1/3D-runner (Branch: main, Commit: e07e5ab)
+03:48:34.075 Previous build caches not available.
+03:48:35.843 Cloning completed: 1.771s
+03:48:35.879 Found .vercelignore
+03:48:35.900 Removed 128 ignored files defined in .vercelignore
+03:48:35.901   /.git/config
+03:48:35.901   /.git/description
+03:48:35.901   /.git/FETCH_HEAD
+03:48:35.901   /.git/HEAD
+03:48:35.901   /.git/hooks/applypatch-msg.sample
+03:48:35.901   /.git/hooks/commit-msg.sample
+03:48:35.901   /.git/hooks/fsmonitor-watchman.sample
+03:48:35.901   /.git/hooks/post-update.sample
+03:48:35.901   /.git/hooks/pre-applypatch.sample
+03:48:35.901   /.git/hooks/pre-commit.sample
+03:48:36.216 Running "vercel build"
+03:48:36.617 Vercel CLI 48.10.2
+03:48:37.190 Installing dependencies...
+03:48:42.798 npm warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.is
+03:48:42.848 npm warn deprecated @esbuild-kit/esm-loader@2.6.5: Merged into tsx: https://tsx.is
+03:48:43.254 npm warn deprecated react-use-gesture@9.1.3: This package is no longer maintained. Please use @use-gesture/react instead
+03:48:44.252 npm warn deprecated three-mesh-bvh@0.7.8: Deprecated due to three.js version incompatibility. Please use v0.8.0, instead.
+03:48:50.847 
+03:48:50.847 added 610 packages in 13s
+03:48:50.848 
+03:48:50.849 84 packages are looking for funding
+03:48:50.849   run `npm fund` for details
+03:48:51.034 
+03:48:51.035 > rest-express@1.0.0 build
+03:48:51.035 > vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+03:48:51.035 
+03:48:51.456 [36mvite v5.4.19 [32mbuilding for production...[36m[39m
+03:48:51.487 [32m✓[39m 0 modules transformed.
+03:48:51.489 [31mx[39m Build failed in 11ms
+03:48:51.489 [31merror during build:
+03:48:51.489 [31mCould not resolve entry module "index.html".[31m
+03:48:51.489     at getRollupError (file:///vercel/path0/node_modules/rollup/dist/es/shared/parseAst.js:396:41)
+03:48:51.490     at error (file:///vercel/path0/node_modules/rollup/dist/es/shared/parseAst.js:392:42)
+03:48:51.490     at ModuleLoader.loadEntryModule (file:///vercel/path0/node_modules/rollup/dist/es/shared/node-entry.js:20086:20)
+03:48:51.490     at async Promise.all (index 0)[39m
+03:48:51.503 Error: Command "npm run build" exited with 1
