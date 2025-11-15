@@ -2,6 +2,8 @@ import { useStepChallenge } from "@/lib/stores/useStepChallenge";
 import { useAudio } from "@/lib/stores/useAudio";
 import { Button } from "./ui/button";
 import { Trophy, RotateCcw, Volume2, VolumeX } from "lucide-react";
+import Confetti from "react-confetti";
+import { useEffect, useState } from "react";
 
 export function VictoryScreen() {
   const score = useStepChallenge((state) => state.score);
@@ -11,23 +13,44 @@ export function VictoryScreen() {
   const isMuted = useAudio((state) => state.isMuted);
   const toggleMute = useAudio((state) => state.toggleMute);
   
+  const [windowSize, setWindowSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+  
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-green-500 via-emerald-400 to-teal-500 z-50 overflow-hidden">
-      <div className="absolute inset-0 bg-black/10"></div>
+    <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none overflow-hidden">
+      <Confetti
+        width={windowSize.width}
+        height={windowSize.height}
+        recycle={true}
+        numberOfPieces={200}
+        gravity={0.3}
+      />
       
-      <div className="absolute top-0 left-0 w-96 h-96 bg-yellow-300 rounded-full filter blur-3xl opacity-30 animate-pulse"></div>
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-green-300 rounded-full filter blur-3xl opacity-30 animate-pulse" style={{ animationDelay: '1s' }}></div>
+      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm pointer-events-none"></div>
       
       <Button 
         onClick={toggleMute}
         variant="secondary"
         size="icon"
-        className="absolute top-4 right-4 rounded-full shadow-lg z-10 bg-white/90 hover:bg-white"
+        className="absolute top-4 right-4 rounded-full shadow-lg z-10 bg-white/90 hover:bg-white pointer-events-auto"
       >
         {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
       </Button>
       
-      <div className="relative bg-white/95 backdrop-blur-xl rounded-3xl p-4 lg:p-6 max-w-md mx-4 shadow-2xl text-center border-4 border-yellow-400 max-h-[90vh] overflow-y-auto">
+      <div className="relative bg-white/95 backdrop-blur-xl rounded-3xl p-4 lg:p-6 max-w-md mx-4 shadow-2xl text-center border-4 border-yellow-400 max-h-[90vh] overflow-y-auto pointer-events-auto">
         <div className="mb-3">
           <div className="relative inline-block">
             <Trophy className="h-16 lg:h-20 w-16 lg:w-20 text-yellow-500 mx-auto mb-2 drop-shadow-2xl animate-bounce" />

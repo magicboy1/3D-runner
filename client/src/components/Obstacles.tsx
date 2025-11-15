@@ -27,6 +27,7 @@ export function Obstacles() {
   const currentLane = useStepChallenge((state) => state.currentLane);
   const playerY = useStepChallenge((state) => state.playerY);
   const playerHeight = useStepChallenge((state) => state.playerHeight);
+  const distance = useStepChallenge((state) => state.distance);
   const gameOver = useStepChallenge((state) => state.gameOver);
   const gameSpeed = useStepChallenge((state) => state.gameSpeed);
   const playHit = useAudio((state) => state.playHit);
@@ -66,6 +67,12 @@ export function Obstacles() {
         child.rotation.y += delta * 2;
         
         if (child.position.z > 15) {
+          if (distance >= 1000) {
+            child.position.z = -2000;
+            child.position.y = -100;
+            return;
+          }
+          
           child.position.z = -500;
           obstacle.hit = false;
           
