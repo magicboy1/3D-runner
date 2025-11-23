@@ -36,6 +36,7 @@ export function Obstacles() {
   const playerBox = useRef(new THREE.Box3());
   const obstacleBox = useRef(new THREE.Box3());
   const lastPhaseRef = useRef(phase);
+  const finishLineClearedRef = useRef(false);
   
   const obstacles = useMemo(() => {
     const obstacleList: Obstacle[] = [];
@@ -73,10 +74,20 @@ export function Obstacles() {
         }
       });
       laneCounter.current = 0;
+      finishLineClearedRef.current = false;
     }
     lastPhaseRef.current = phase;
     
     if (phase !== "playing") return;
+    
+    if (distance >= 950 && !finishLineClearedRef.current && groupRef.current) {
+      groupRef.current.children.forEach((child, index) => {
+        if (child.position.z > -100) {
+          child.position.z = -5000;
+        }
+      });
+      finishLineClearedRef.current = true;
+    }
     
     if (groupRef.current) {
       let playerBoxComputed = false;
@@ -89,36 +100,40 @@ export function Obstacles() {
         child.rotation.y += delta * 2;
         
         if (child.position.z > 15) {
-          child.position.z = -500;
-          obstacle.hit = false;
-          
-          const lanes: ("left" | "center" | "right")[] = ["left", "center", "right"];
-          
-          const veryCloseObstacles = obstacles.filter((obs, idx) => {
-            if (idx === index) return false;
-            const otherChild = groupRef.current?.children[idx];
-            if (!otherChild) return false;
-            const zDiff = Math.abs(otherChild.position.z - (-500));
-            return zDiff < 10;
-          });
-          
-          const occupiedLanes = veryCloseObstacles.map(obs => obs.lane);
-          
-          let newLane: "left" | "center" | "right";
-          if (occupiedLanes.length >= 2) {
-            const freeLane = lanes.find(lane => !occupiedLanes.includes(lane));
-            newLane = freeLane || lanes[laneCounter.current % lanes.length];
+          if (distance < 950) {
+            child.position.z = -500;
+            obstacle.hit = false;
+            
+            const lanes: ("left" | "center" | "right")[] = ["left", "center", "right"];
+            
+            const veryCloseObstacles = obstacles.filter((obs, idx) => {
+              if (idx === index) return false;
+              const otherChild = groupRef.current?.children[idx];
+              if (!otherChild) return false;
+              const zDiff = Math.abs(otherChild.position.z - (-500));
+              return zDiff < 10;
+            });
+            
+            const occupiedLanes = veryCloseObstacles.map(obs => obs.lane);
+            
+            let newLane: "left" | "center" | "right";
+            if (occupiedLanes.length >= 2) {
+              const freeLane = lanes.find(lane => !occupiedLanes.includes(lane));
+              newLane = freeLane || lanes[laneCounter.current % lanes.length];
+            } else {
+              const availableLanes = lanes.filter(lane => !occupiedLanes.includes(lane));
+              newLane = availableLanes[laneCounter.current % availableLanes.length];
+            }
+            laneCounter.current++;
+            
+            obstacle.lane = newLane;
+            obstacle.type = "barrier";
+            
+            child.position.x = lanePositions[newLane];
+            child.position.y = 1.2;
           } else {
-            const availableLanes = lanes.filter(lane => !occupiedLanes.includes(lane));
-            newLane = availableLanes[laneCounter.current % availableLanes.length];
+            child.position.z = -5000;
           }
-          laneCounter.current++;
-          
-          obstacle.lane = newLane;
-          obstacle.type = "barrier";
-          
-          child.position.x = lanePositions[newLane];
-          child.position.y = 1.2;
         }
         
         const obstacleZ = child.position.z;

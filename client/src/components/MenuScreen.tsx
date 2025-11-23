@@ -1,12 +1,39 @@
+import { useState, useEffect } from "react";
 import { useStepChallenge } from "@/lib/stores/useStepChallenge";
 import { useAudio } from "@/lib/stores/useAudio";
 import { Button } from "./ui/button";
-import { Volume2, VolumeX } from "lucide-react";
+import { Volume2, VolumeX, Maximize, Minimize } from "lucide-react";
 
 export function MenuScreen() {
   const start = useStepChallenge((state) => state.start);
   const isMuted = useAudio((state) => state.isMuted);
   const toggleMute = useAudio((state) => state.toggleMute);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+  
+  const toggleFullscreen = async () => {
+    try {
+      if (!document.fullscreenElement) {
+        if (document.documentElement.requestFullscreen) {
+          await document.documentElement.requestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          await document.exitFullscreen();
+        }
+      }
+    } catch (err) {
+      console.log('Fullscreen error:', err);
+    }
+  };
   
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
@@ -26,6 +53,15 @@ export function MenuScreen() {
         className="absolute top-4 right-4 rounded-full shadow-lg z-20 bg-white/90 hover:bg-white"
       >
         {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+      </Button>
+      
+      <Button 
+        onClick={toggleFullscreen}
+        variant="secondary"
+        size="icon"
+        className="absolute bottom-4 left-4 rounded-full shadow-lg z-20 bg-white/90 hover:bg-white"
+      >
+        {isFullscreen ? <Minimize className="h-5 w-5" /> : <Maximize className="h-5 w-5" />}
       </Button>
       
       <div className="relative h-full flex flex-col items-center justify-center px-4 z-10">

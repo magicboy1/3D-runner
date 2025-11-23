@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useStepChallenge } from "@/lib/stores/useStepChallenge";
 import { useAudio } from "@/lib/stores/useAudio";
 import { Button } from "./ui/button";
-import { Pause, Volume2, VolumeX } from "lucide-react";
+import { Home, Volume2, VolumeX } from "lucide-react";
 
 export function GameUI() {
   const score = useStepChallenge((state) => state.score);
@@ -71,7 +71,7 @@ export function GameUI() {
                 boxShadow: '0 8px 30px rgba(239, 68, 68, 0.4)'
               }}
             >
-              <Pause className="h-5 w-5 text-white" />
+              <Home className="h-5 w-5 text-white" />
             </Button>
           </div>
         </div>
