@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
+import * as THREE from "three";
 
 export type GamePhase = "menu" | "playing" | "gameover" | "victory";
 export type Lane = "left" | "center" | "right";
@@ -19,6 +20,7 @@ interface GameState {
   playerAction: PlayerAction;
   playerY: number;
   playerHeight: number;
+  playerRef: THREE.Group | null;
   message: Message | null;
   gameSpeed: number;
   multiplier: number;
@@ -30,6 +32,7 @@ interface GameState {
   slide: () => void;
   resetAction: () => void;
   setPlayerPosition: (y: number, height: number) => void;
+  setPlayerRef: (ref: THREE.Group | null) => void;
   addScore: (points: number) => void;
   addDistance: (dist: number) => void;
   increaseSpeed: () => void;
@@ -48,6 +51,7 @@ export const useStepChallenge = create<GameState>()(
     playerAction: "running",
     playerY: 0,
     playerHeight: 1.2,
+    playerRef: null,
     message: null,
     gameSpeed: 15,
     multiplier: 1,
@@ -106,6 +110,10 @@ export const useStepChallenge = create<GameState>()(
     
     setPlayerPosition: (y: number, height: number) => {
       set({ playerY: y, playerHeight: height });
+    },
+    
+    setPlayerRef: (ref: THREE.Group | null) => {
+      set({ playerRef: ref });
     },
     
     addScore: (points: number) => {

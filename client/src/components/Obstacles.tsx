@@ -1,4 +1,4 @@
-import { useRef, useMemo, Suspense } from "react";
+import { useRef, useMemo, Suspense, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
@@ -24,15 +24,17 @@ function VirusModel({ scale = 1 }: { scale?: number }) {
 
 export function Obstacles() {
   const groupRef = useRef<THREE.Group>(null);
+  const playerRef = useStepChallenge((state) => state.playerRef);
   const currentLane = useStepChallenge((state) => state.currentLane);
-  const playerY = useStepChallenge((state) => state.playerY);
-  const playerHeight = useStepChallenge((state) => state.playerHeight);
   const phase = useStepChallenge((state) => state.phase);
   const distance = useStepChallenge((state) => state.distance);
   const gameOver = useStepChallenge((state) => state.gameOver);
   const gameSpeed = useStepChallenge((state) => state.gameSpeed);
   const playHit = useAudio((state) => state.playHit);
   const laneCounter = useRef(0);
+  
+  const playerBox = useRef(new THREE.Box3());
+  const obstacleBox = useRef(new THREE.Box3());
   
   const obstacles = useMemo(() => {
     const obstacleList: Obstacle[] = [];
@@ -62,6 +64,8 @@ export function Obstacles() {
     if (phase !== "playing") return;
     
     if (groupRef.current) {
+      let playerBoxComputed = false;
+      
       groupRef.current.children.forEach((child, index) => {
         const obstacle = obstacles[index];
         if (!obstacle) return;
@@ -103,35 +107,21 @@ export function Obstacles() {
         }
         
         const obstacleZ = child.position.z;
-        const isAhead = obstacleZ < 0;
-        const distanceToPlayer = Math.abs(obstacleZ);
         
-        if (isAhead && distanceToPlayer < 1.5 && !obstacle.hit) {
-          if (obstacle.lane !== currentLane) return;
+        if (obstacleZ >= -1.0 && obstacleZ <= 1.0 && !obstacle.hit && playerRef) {
+          if (!playerBoxComputed) {
+            playerRef.updateWorldMatrix(true, false);
+            playerBox.current.setFromObject(playerRef);
+            playerBoxComputed = true;
+          }
           
-          const playerTop = playerY + playerHeight / 2;
-          const playerBottom = playerY - playerHeight / 2;
+          child.updateWorldMatrix(true, false);
+          obstacleBox.current.setFromObject(child);
           
-          const obstacleY = child.position.y;
-          const obstacleHeight = 1.0;
-          const obstacleBottom = obstacleY - obstacleHeight / 2;
-          const obstacleTop = obstacleY + obstacleHeight / 2;
-          
-          const verticalOverlap = !(playerTop < obstacleBottom || playerBottom > obstacleTop);
-          
-          if (verticalOverlap) {
-            console.log("Collision detected!", {
-              lane: obstacle.lane,
-              currentLane,
-              playerY,
-              playerHeight,
-              playerTop,
-              playerBottom,
-              obstacleY,
-              obstacleHeight,
-              obstacleBottom,
-              obstacleTop,
-              type: obstacle.type
+          if (obstacleBox.current.intersectsBox(playerBox.current)) {
+            console.log("Box3 Collision!", {
+              obstacleZ,
+              lane: obstacle.lane
             });
             obstacle.hit = true;
             playHit();

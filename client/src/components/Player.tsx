@@ -36,6 +36,12 @@ export function Player() {
   const playerAction = useStepChallenge((state) => state.playerAction);
   const resetAction = useStepChallenge((state) => state.resetAction);
   const setPlayerPosition = useStepChallenge((state) => state.setPlayerPosition);
+  const setPlayerRef = useStepChallenge((state) => state.setPlayerRef);
+  
+  useEffect(() => {
+    setPlayerRef(groupRef.current);
+    return () => setPlayerRef(null);
+  }, [setPlayerRef]);
   
   const jumpVelocityRef = useRef(0);
   const isJumpingRef = useRef(false);
