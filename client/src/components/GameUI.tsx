@@ -79,15 +79,18 @@ export function GameUI() {
         {message && (
           <div className="absolute top-32 left-0 right-0 flex justify-center pointer-events-none">
             <div 
-              className={`px-8 py-4 rounded-2xl shadow-2xl transform animate-bounce backdrop-blur-md ${
+              className={`px-8 py-4 rounded-2xl shadow-2xl transform animate-bounce backdrop-blur-lg ${
                 message.type === "warning" 
-                  ? "bg-red-500/30" 
-                  : "bg-green-500/30"
+                  ? "bg-red-500/20" 
+                  : "bg-green-500/20"
               }`}
               style={{
                 boxShadow: message.type === "warning"
-                  ? '0 15px 50px rgba(239, 68, 68, 0.3)'
-                  : '0 15px 50px rgba(34, 197, 94, 0.3)'
+                  ? '0 15px 50px rgba(239, 68, 68, 0.4)'
+                  : '0 15px 50px rgba(34, 197, 94, 0.4)',
+                border: message.type === "warning"
+                  ? '2px solid rgba(239, 68, 68, 0.3)'
+                  : '2px solid rgba(34, 197, 94, 0.3)'
               }}
               dir="rtl"
             >
