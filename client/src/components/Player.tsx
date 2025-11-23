@@ -61,7 +61,7 @@ export function Player() {
   
   useEffect(() => {
     if (playerAction === "jumping" && !isJumpingRef.current) {
-      jumpVelocityRef.current = 0.38;
+      jumpVelocityRef.current = 0.43;
       isJumpingRef.current = true;
     } else if (playerAction === "sliding") {
       slideTimerRef.current = 0.5;
