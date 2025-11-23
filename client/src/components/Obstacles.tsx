@@ -80,7 +80,7 @@ export function Obstacles() {
     
     if (phase !== "playing") return;
     
-    if (distance >= 950 && !finishLineClearedRef.current && groupRef.current) {
+    if (distance >= 980 && !finishLineClearedRef.current && groupRef.current) {
       groupRef.current.children.forEach((child, index) => {
         if (child.position.z > -100) {
           child.position.z = -5000;
@@ -100,7 +100,7 @@ export function Obstacles() {
         child.rotation.y += delta * 2;
         
         if (child.position.z > 15) {
-          if (distance < 950) {
+          if (distance < 980) {
             child.position.z = -500;
             obstacle.hit = false;
             
