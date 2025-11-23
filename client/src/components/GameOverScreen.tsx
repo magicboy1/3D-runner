@@ -27,7 +27,7 @@ export function GameOverScreen() {
         {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
       </Button>
       
-      <div className="relative bg-white/95 backdrop-blur-xl rounded-3xl p-8 lg:p-12 max-w-md mx-4 shadow-2xl text-center border-4 border-white/50">
+      <div className="relative bg-white/20 backdrop-blur-lg rounded-3xl p-8 lg:p-12 max-w-md mx-4 shadow-2xl text-center border-4 border-white/30">
         <div className="mb-6">
           <div className="text-8xl mb-4 animate-bounce">😵</div>
         </div>
