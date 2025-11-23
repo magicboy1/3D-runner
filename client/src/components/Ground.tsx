@@ -12,6 +12,7 @@ export function Ground() {
   const increaseSpeed = useStepChallenge((state) => state.increaseSpeed);
   
   const distanceCounterRef = useRef(0);
+  const lastPhaseRef = useRef(phase);
   
   const tiles = useMemo(() => {
     const tileList = [];
@@ -25,6 +26,16 @@ export function Ground() {
   }, []);
   
   useFrame((state, delta) => {
+    if (lastPhaseRef.current !== phase && phase === "playing") {
+      distanceCounterRef.current = 0;
+      if (groupRef.current) {
+        groupRef.current.children.forEach((tile, index) => {
+          tile.position.z = -tiles[index].z;
+        });
+      }
+    }
+    lastPhaseRef.current = phase;
+    
     if (phase !== "playing") return;
     
     if (groupRef.current) {

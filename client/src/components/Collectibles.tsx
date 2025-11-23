@@ -50,6 +50,7 @@ export function Collectibles() {
   const playSuccess = useAudio((state) => state.playSuccess);
   const laneCounter = useRef(0);
   const typeCounter = useRef(0);
+  const lastPhaseRef = useRef(phase);
   
   const collectibles = useMemo(() => {
     const collectibleList: Collectible[] = [];
@@ -80,6 +81,21 @@ export function Collectibles() {
   };
   
   useFrame((state, delta) => {
+    if (lastPhaseRef.current !== phase && phase === "playing") {
+      collectibles.forEach((collectible, index) => {
+        collectible.collected = false;
+        if (groupRef.current?.children[index]) {
+          const child = groupRef.current.children[index];
+          child.position.x = lanePositions[collectible.lane];
+          child.position.y = 1.2;
+          child.position.z = collectible.z;
+        }
+      });
+      laneCounter.current = 0;
+      typeCounter.current = 0;
+    }
+    lastPhaseRef.current = phase;
+    
     if (phase !== "playing") return;
     
     if (groupRef.current) {

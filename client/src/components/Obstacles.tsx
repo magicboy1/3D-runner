@@ -35,6 +35,7 @@ export function Obstacles() {
   
   const playerBox = useRef(new THREE.Box3());
   const obstacleBox = useRef(new THREE.Box3());
+  const lastPhaseRef = useRef(phase);
   
   const obstacles = useMemo(() => {
     const obstacleList: Obstacle[] = [];
@@ -61,6 +62,20 @@ export function Obstacles() {
   };
   
   useFrame((state, delta) => {
+    if (lastPhaseRef.current !== phase && phase === "playing") {
+      obstacles.forEach((obstacle, index) => {
+        obstacle.hit = false;
+        if (groupRef.current?.children[index]) {
+          const child = groupRef.current.children[index];
+          child.position.x = lanePositions[obstacle.lane];
+          child.position.y = 1.2;
+          child.position.z = obstacle.z;
+        }
+      });
+      laneCounter.current = 0;
+    }
+    lastPhaseRef.current = phase;
+    
     if (phase !== "playing") return;
     
     if (groupRef.current) {

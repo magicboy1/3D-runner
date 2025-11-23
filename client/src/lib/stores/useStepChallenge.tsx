@@ -63,6 +63,8 @@ export const useStepChallenge = create<GameState>()(
         distance: 0,
         currentLane: "center",
         playerAction: "running",
+        playerY: 1.2,
+        playerHeight: 1.2,
         message: null,
         gameSpeed: 15,
         multiplier: 1
@@ -76,6 +78,8 @@ export const useStepChallenge = create<GameState>()(
         distance: 0,
         currentLane: "center",
         playerAction: "running",
+        playerY: 1.2,
+        playerHeight: 1.2,
         message: null,
         gameSpeed: 15,
         multiplier: 1
