@@ -12,11 +12,8 @@ export function GameOverScreen() {
   const toggleMute = useAudio((state) => state.toggleMute);
   
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400 z-50 overflow-hidden">
-      <div className="absolute inset-0 bg-black/10"></div>
-      
-      <div className="absolute top-0 left-0 w-96 h-96 bg-yellow-400 rounded-full filter blur-3xl opacity-20 animate-pulse"></div>
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-pink-400 rounded-full filter blur-3xl opacity-20 animate-pulse" style={{ animationDelay: '1s' }}></div>
+    <div className="fixed inset-0 flex items-center justify-center z-50 overflow-hidden">
+      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm"></div>
       
       <Button 
         onClick={toggleMute}
