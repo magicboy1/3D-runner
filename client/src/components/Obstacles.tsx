@@ -108,7 +108,7 @@ export function Obstacles() {
         
         const obstacleZ = child.position.z;
         
-        if (obstacleZ >= -1.0 && obstacleZ <= 1.0 && !obstacle.hit && playerRef) {
+        if (obstacleZ >= -1.5 && obstacleZ <= 1.5 && !obstacle.hit && playerRef) {
           if (!playerBoxComputed) {
             playerRef.updateWorldMatrix(true, false);
             playerBox.current.setFromObject(playerRef);
@@ -119,9 +119,17 @@ export function Obstacles() {
           obstacleBox.current.setFromObject(child);
           
           if (obstacleBox.current.intersectsBox(playerBox.current)) {
-            console.log("Box3 Collision!", {
+            console.log("Box3 Collision detected!", {
               obstacleZ,
-              lane: obstacle.lane
+              lane: obstacle.lane,
+              obstacleBox: {
+                min: obstacleBox.current.min,
+                max: obstacleBox.current.max
+              },
+              playerBox: {
+                min: playerBox.current.min,
+                max: playerBox.current.max
+              }
             });
             obstacle.hit = true;
             playHit();
